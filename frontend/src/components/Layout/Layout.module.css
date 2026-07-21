@@ -1,0 +1,9 @@
+/* Layout.module.css */
+/* The Layout component itself is a thin shell;
+   these styles cover the main content area wrapper */
+
+.main {
+  min-height: 60vh;
+  display: flex;
+  flex-direction: column;
+}

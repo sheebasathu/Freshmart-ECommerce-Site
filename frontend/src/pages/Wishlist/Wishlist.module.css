@@ -1,0 +1,340 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   Wishlist.module.css
+   Matches FreshMart green design system (primary: #21B421)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Page wrapper ────────────────────────────────────────────────────────── */
+.page {
+  padding: 32px 0 60px;
+  min-height: 70vh;
+  background: #f9fafb;
+}
+
+/* ── Page header ─────────────────────────────────────────────────────────── */
+.pageHeader {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.pageTitle {
+  font-size: 26px;
+  font-weight: 900;
+  color: #1a1a1a;
+  margin: 0 0 4px;
+}
+
+.pageSubtitle {
+  font-size: 14px;
+  color: #888;
+  margin: 0;
+}
+
+.continueShopping {
+  font-size: 14px;
+  font-weight: 700;
+  color: #374151;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 16px;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 8px;
+  background: #fff;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.continueShopping:hover {
+  border-color: #21B421;
+  color: #21B421;
+  background: #f0fdf4;
+}
+
+/* ── Product grid ─────────────────────────────────────────────────────────── */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+/* ── Wishlist card ────────────────────────────────────────────────────────── */
+.card {
+  background: #fff;
+  border: 1px solid #e8e8e8;
+  border-radius: 14px;
+  overflow: hidden;
+  position: relative;
+  transition: box-shadow 0.22s, transform 0.18s;
+  display: flex;
+  flex-direction: column;
+}
+.card:hover {
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.11);
+  transform: translateY(-2px);
+}
+
+/* ── Remove (✕) button — top-right ────────────────────────────────────────── */
+.removeBtn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #fff;
+  border: 1px solid #e8e8e8;
+  cursor: pointer;
+  font-size: 11px;
+  color: #9ca3af;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.18s;
+  line-height: 1;
+}
+.removeBtn:hover {
+  background: #fee2e2;
+  color: #c0392b;
+  border-color: #c0392b;
+}
+
+/* ── Heart button — top-left ──────────────────────────────────────────────── */
+.heartBtn {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid #e8e8e8;
+  cursor: pointer;
+  font-size: 15px;
+  color: #d1d5db;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.18s;
+  line-height: 1;
+  backdrop-filter: blur(4px);
+}
+.heartBtn:hover {
+  border-color: #c0392b;
+  color: #c0392b;
+}
+.heartActive {
+  color: #c0392b;
+  border-color: #c0392b;
+  background: #fff5f5;
+}
+
+/* ── Product image ────────────────────────────────────────────────────────── */
+.imgWrap {
+  height: 190px;
+  overflow: hidden;
+  cursor: pointer;
+  background: #f9fafb;
+  position: relative;
+}
+.imgWrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.32s ease;
+  display: block;
+}
+.card:hover .imgWrap img {
+  transform: scale(1.05);
+}
+
+/* ── Badge (e.g. "41% OFF") ───────────────────────────────────────────────── */
+.badge {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  background: #21B421;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 800;
+  padding: 2px 7px;
+  border-radius: 5px;
+  letter-spacing: 0.3px;
+  z-index: 2;
+}
+
+/* ── Card body ────────────────────────────────────────────────────────────── */
+.body {
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.brand {
+  font-size: 11px;
+  font-weight: 700;
+  color: #21B421;
+  text-transform: capitalize;
+  margin-bottom: 4px;
+  cursor: pointer;
+}
+
+.name {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 4px;
+  line-height: 1.35;
+  cursor: pointer;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.name:hover {
+  color: #21B421;
+}
+
+.weight {
+  font-size: 12px;
+  color: #888;
+  margin-bottom: 8px;
+}
+
+/* ── Price row ────────────────────────────────────────────────────────────── */
+.priceRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 6px;
+}
+.price {
+  font-size: 17px;
+  font-weight: 900;
+  color: #1a1a1a;
+}
+.origPrice {
+  font-size: 12px;
+  color: #bbb;
+  text-decoration: line-through;
+  font-weight: 400;
+}
+.discountBadge {
+  font-size: 10px;
+  font-weight: 800;
+  color: #21B421;
+  background: #f0fdf4;
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid #bbf7d0;
+}
+
+/* ── Delivery info ────────────────────────────────────────────────────────── */
+.deliveryInfo {
+  font-size: 11px;
+  color: #888;
+  margin-bottom: 12px;
+}
+
+/* ── Add to Cart button ────────────────────────────────────────────────────── */
+.addBtn {
+  margin-top: auto;
+  width: 100%;
+  padding: 10px;
+  background: #21B421;
+  color: #fff;
+  border: none;
+  border-radius: 9px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s;
+  font-family: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.addBtn:hover {
+  background: #1a9a1a;
+}
+.addBtn:disabled {
+  background: #d1d5db;
+  cursor: not-allowed;
+  color: #6b7280;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   Empty / Auth-required states
+   ══════════════════════════════════════════════════════════════════════════ */
+.emptyState {
+  min-height: 70vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 60px 24px;
+  background: #f9fafb;
+}
+
+.emptyIcon {
+  font-size: 72px;
+  margin-bottom: 20px;
+  line-height: 1;
+}
+
+.emptyTitle {
+  font-size: 24px;
+  font-weight: 800;
+  color: #1a1a1a;
+  margin-bottom: 10px;
+}
+
+.emptyText {
+  font-size: 15px;
+  color: #6b7280;
+  margin-bottom: 28px;
+  max-width: 320px;
+  line-height: 1.5;
+}
+
+.shopBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 13px 32px;
+  background: #21B421;
+  color: #fff;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 800;
+  text-decoration: none;
+  transition: background 0.2s, transform 0.15s;
+}
+.shopBtn:hover {
+  background: #1a9a1a;
+  transform: translateY(-1px);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   Responsive
+   ══════════════════════════════════════════════════════════════════════════ */
+@media (max-width: 1200px) {
+  .grid { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 860px) {
+  .grid { grid-template-columns: repeat(2, 1fr); }
+  .pageHeader { flex-direction: column; align-items: flex-start; }
+}
+@media (max-width: 480px) {
+  .grid { grid-template-columns: 1fr; gap: 14px; }
+  .pageTitle { font-size: 22px; }
+}

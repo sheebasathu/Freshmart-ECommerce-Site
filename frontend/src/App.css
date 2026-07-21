@@ -1,0 +1,29 @@
+/* App.css — global overrides / utilities beyond index.css */
+
+/* Smooth page transitions */
+#root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* Leaflet z-index fix (sits below sticky header) */
+.leaflet-top,
+.leaflet-bottom {
+  z-index: 50 !important;
+}
+
+/* Scrollbar styling (Webkit) */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #f1f5f9; }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+/* Selection colour */
+::selection { background: #bbf7d0; color: #14532d; }
+
+/* Focus visible ring for accessibility */
+:focus-visible {
+  outline: 2px solid #21B421;
+  outline-offset: 2px;
+}

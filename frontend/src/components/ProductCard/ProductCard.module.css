@@ -1,0 +1,319 @@
+.card {
+  background: #fff;
+  border: 1.5px solid #ebebeb;
+  border-radius: 12px;
+  overflow: visible;
+  position: relative;
+  transition: box-shadow .2s, transform .2s;
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+}
+
+.card:hover {
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.13);
+  transform: translateY(-2px);
+}
+
+.badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 2;
+  background: #21B421;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 6px;
+  letter-spacing: .3px;
+}
+
+.imgFrame {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1/1;
+  background: #f9fafb;
+  border-radius: 10px 10px 0 0;
+  overflow: hidden;
+}
+
+.imgA,
+.imgB {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: opacity .35s;
+}
+
+.imgB {
+  opacity: 0;
+}
+
+.card:hover .imgA {
+  opacity: 0;
+}
+
+.card:hover .imgB {
+  opacity: 1;
+}
+
+.body {
+  padding: 12px;
+}
+
+.captionRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.brandTag {
+  font-size: 11px;
+  color: #21B421;
+  font-weight: 700;
+  text-transform: capitalize;
+}
+
+.timeBadge {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 10px;
+  color: #888;
+  background: #f5f5f5;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 8px;
+  line-height: 1.3;
+}
+
+/* Weight selector */
+.qtyWrap {
+  position: relative;
+  margin-bottom: 8px;
+}
+
+.qtySelector {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 6px 10px;
+  border: 1px solid #e8e8e8;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #374151;
+  background: #f9fafb;
+  cursor: pointer;
+  transition: border-color .2s;
+}
+
+.qtySelector:hover {
+  border-color: #21B421;
+}
+
+.qtyDrop {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: #fff;
+  border: 1px solid #e8e8e8;
+  border-radius: 8px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, .12);
+  z-index: 100;
+  overflow: hidden;
+}
+
+.qtyOption {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 12px;
+  cursor: pointer;
+  transition: background .15s;
+  font-size: 12px;
+}
+
+.qtyOption:hover {
+  background: #f0fdf4;
+}
+
+.selected {
+  background: #f0fdf4;
+}
+
+.qtyLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.qtyWeight {
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.qtyDisc {
+  font-size: 10px;
+  color: #21B421;
+  font-weight: 700;
+}
+
+.qtyRight {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.qtyPrice {
+  font-weight: 800;
+  color: #1a1a1a;
+}
+
+.qtyOrig {
+  font-size: 10px;
+  color: #bbb;
+  text-decoration: line-through;
+}
+
+.qtyTime {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  color: #888;
+  font-size: 10px;
+}
+
+.priceRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.priceNow {
+  font-size: 16px;
+  font-weight: 800;
+  color: #1a1a1a;
+}
+
+.priceOrig {
+  font-size: 12px;
+  color: #bbb;
+  text-decoration: line-through;
+}
+
+.actionRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.wishBtn {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  border: 1px solid #e8e8e8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: border-color .2s;
+}
+
+.wishBtn:hover {
+  border-color: #c0392b;
+}
+
+.wished {
+  border-color: #c0392b;
+}
+
+.cartArea {
+  flex: 1;
+}
+
+.cartBtn {
+  width: 100%;
+  padding: 8px;
+  background: #21B421;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background .2s;
+  font-family: inherit;
+}
+
+.cartBtn:hover {
+  background: #237a3d;
+}
+
+.stepper {
+  display: flex;
+  align-items: center;
+  border: 1.5px solid #21B421;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.stepBtn {
+  width: 32px;
+  height: 34px;
+  background: #21B421;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background .2s;
+}
+
+.stepBtn:hover {
+  background: #237a3d;
+}
+
+.stepCount {
+  flex: 1;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 800;
+  color: #1a1a1a;
+}
+
+.outOfStock {
+  color: #e74c3c;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.lowStock {
+  color: #f39c12;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.disabled {
+  background: #ccc !important;
+  cursor: not-allowed;
+}

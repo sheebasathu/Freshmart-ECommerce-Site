@@ -1,0 +1,563 @@
+/* =========================================================================
+   ProductDetail.module.css
+   Pixel-perfect match to the FreshMart product-detail screenshots.
+   ========================================================================= */
+
+/* ── Global page container ─────────────────────────────────────────────── */
+.page {
+  padding-bottom: 80px;
+  background: #fff;
+  font-family: 'Nunito', sans-serif;
+}
+
+/* ── Spinner ────────────────────────────────────────────────────────────── */
+.spinnerWrap {
+  display: flex; justify-content: center; align-items: center; height: 60vh;
+}
+.spinner {
+  width: 40px; height: 40px;
+  border: 4px solid #e5e7eb; border-top-color: #21B421;
+  border-radius: 50%; animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Not-found ──────────────────────────────────────────────────────────── */
+.notFound { text-align: center; padding: 80px 20px; }
+.notFound h2 { font-size: 22px; margin-bottom: 16px; }
+.notFound button {
+  padding: 10px 24px; background: #21B421; color: #fff;
+  border: none; border-radius: 8px; cursor: pointer; font-weight: 700;
+}
+
+/* ── Toast ──────────────────────────────────────────────────────────────── */
+.toast {
+  position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%);
+  background: #1a1a1a; color: #fff; padding: 12px 24px; border-radius: 10px;
+  font-size: 14px; font-weight: 600; z-index: 9999;
+  box-shadow: 0 4px 16px rgba(0,0,0,.25);
+  animation: fadeUp .3s ease;
+}
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateX(-50%) translateY(10px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+/* ── Breadcrumb ─────────────────────────────────────────────────────────── */
+/*  Home / Fruits & Vegetables / Fresh Vegetables / capsicum-Green          */
+.breadcrumb {
+  display: flex; align-items: center; flex-wrap: wrap;
+  gap: 4px; padding: 18px 0 10px;
+  font-size: 13px; color: #6b7280;
+}
+.breadcrumb a { color: #6b7280; text-decoration: none; }
+.breadcrumb a:hover { color: #21B421; }
+.sep { color: #c4c4c4; padding: 0 2px; }
+.crumbCur { color: #374151; font-weight: 700; }
+
+/* =========================================================================
+   SECTION 1 — HERO  (3-col grid)
+   columns: [100px thumbnails] [1fr main image] [1fr info]
+   ========================================================================= */
+.heroWrap {
+  display: grid;
+  grid-template-columns: 100px 1fr 1fr;
+  gap: 24px;
+  align-items: start;
+  padding: 16px 0 48px;
+}
+
+/* ── Thumbnail column ───────────────────────────────────────────────────── */
+.thumbCol {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Each thumbnail button: 80×80 with 2px border, green when active */
+.thumb {
+  width: 80px; height: 80px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 2px solid #e8e8e8;
+  cursor: pointer;
+  background: #f9fafb;
+  padding: 0;
+  transition: border-color .2s;
+  flex-shrink: 0;
+}
+.thumb img {
+  width: 100%; height: 100%;
+  object-fit: cover; display: block;
+}
+.thumb:hover    { border-color: #21B421; }
+.thumbActive    { border-color: #21B421 !important; }
+/* Empty placeholder slot (grey box when product has < 4 images) */
+.thumbEmpty { border-style: dashed; cursor: default; }
+.thumbEmpty:hover { border-color: #e8e8e8; }
+
+/* ── Main image column ──────────────────────────────────────────────────── */
+.mainImgCol { position: relative; }
+.mainImgWrap {
+  border-radius: 12px;
+  overflow: hidden;
+  background: #f5f5f5;
+  position: relative;
+}
+.mainImg {
+  width: 100%; height: 440px;
+  object-fit: cover; display: block;
+  transition: opacity .25s;
+}
+
+/* Arrow buttons — bottom-right corner, circular white buttons */
+.imgArrows {
+  position: absolute;
+  bottom: 14px; right: 14px;
+  display: flex; gap: 8px;
+}
+.arrow {
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.92);
+  border: 1px solid #e0e0e0;
+  cursor: pointer;
+  font-size: 16px;
+  display: flex; align-items: center; justify-content: center;
+  transition: background .15s;
+}
+.arrow:hover { background: #fff; }
+
+/* ── Info column ────────────────────────────────────────────────────────── */
+.infoCol { padding-top: 4px; }
+
+/* Brand — small green text above the title */
+.brand {
+  color: #21B421;
+  font-size: 13px; font-weight: 700;
+  margin-bottom: 6px;
+  letter-spacing: .2px;
+}
+
+/* Product title */
+.productTitle {
+  font-size: 22px; font-weight: 800;
+  color: #1a1a1a; line-height: 1.3;
+  margin: 0 0 14px;
+}
+
+/* Pricing rows */
+.mrpRow {
+  font-size: 13px; color: #888;
+  margin-bottom: 3px;
+}
+.mrpRow s { color: #bbb; }
+.priceRow {
+  font-size: 13px; color: #555;
+  margin-bottom: 3px;
+}
+.priceAmt {
+  font-size: 24px; font-weight: 900;
+  color: #1a1a1a; margin-left: 4px;
+}
+.saveRow {
+  font-size: 13px; color: #21B421; font-weight: 700;
+  margin-bottom: 2px;
+}
+.taxRow {
+  font-size: 12px; color: #aaa;
+  margin-bottom: 20px;
+}
+
+/* ── CTA row — "Add to Basket" (red) + "Save for later" (white) ─────────── */
+.ctaRow {
+  display: flex; gap: 12px;
+  margin-bottom: 28px; flex-wrap: wrap;
+}
+
+/* Add to Basket — dark red, rounded */
+.btnAdd {
+  background: #c0392b; color: #fff;
+  border: none; border-radius: 8px;
+  padding: 12px 28px;
+  font-size: 14px; font-weight: 700;
+  cursor: pointer; font-family: inherit;
+  min-width: 150px;
+  transition: background .2s;
+}
+.btnAdd:hover { background: #a93226; }
+
+/* Inline stepper — replaces "Add to Basket" when qty > 0 */
+.stepper {
+  display: flex; align-items: center; gap: 0;
+  background: #c0392b; border-radius: 8px; overflow: hidden;
+  min-width: 120px;
+}
+.stepperBtn {
+  background: none; border: none; color: #fff;
+  width: 38px; height: 44px;
+  font-size: 20px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background .15s;
+}
+.stepperBtn:hover { background: rgba(255,255,255,.15); }
+.stepperQty {
+  flex: 1; text-align: center;
+  color: #fff; font-size: 15px; font-weight: 800;
+}
+
+/* Save for later — white with border, bookmark icon */
+.btnSave {
+  display: flex; align-items: center; gap: 8px;
+  background: #fff; color: #374151;
+  border: 1.5px solid #d1d5db;
+  border-radius: 8px; padding: 12px 20px;
+  font-size: 14px; font-weight: 600;
+  cursor: pointer; font-family: inherit;
+  transition: border-color .2s, color .2s;
+}
+.btnSave:hover { border-color: #21B421; color: #21B421; }
+.btnSaved { border-color: #21B421 !important; color: #21B421 !important; }
+
+/* ── Pack Sizes ─────────────────────────────────────────────────────────── */
+.packSection { }
+.packTitle {
+  font-size: 15px; font-weight: 700; color: #1a1a1a;
+  margin-bottom: 10px;
+}
+.packList { display: flex; flex-direction: column; gap: 8px; }
+
+/* Each variant row:  [weight] [price block] [delivery badge] [✓] */
+.packItem {
+  display: grid;
+  grid-template-columns: 1fr auto auto auto;
+  align-items: center; gap: 12px;
+  padding: 12px 16px;
+  border: 1.5px solid #e5e7eb; border-radius: 10px;
+  background: #fff; cursor: pointer;
+  transition: border-color .2s, background .2s;
+}
+.packItem:hover { border-color: #21B421; }
+
+/* Selected row: green border + very light green background */
+.packSelected {
+  border-color: #21B421 !important;
+  background: #f0fdf4 !important;
+}
+
+.packWeight { font-size: 14px; font-weight: 600; color: #1a1a1a; }
+
+.packPriceBlock { text-align: right; }
+.packPrice { font-size: 16px; font-weight: 800; color: #1a1a1a; display: block; }
+.packPriceMeta {
+  display: flex; gap: 6px; align-items: center;
+  justify-content: flex-end; margin-top: 2px;
+}
+.packMrp { font-size: 11px; color: #bbb; text-decoration: line-through; }
+.packDiscount {
+  font-size: 11px; color: #21B421; font-weight: 700;
+  background: #dcfce7; padding: 1px 5px; border-radius: 4px;
+}
+
+/* Delivery badge: ⚡ 10 MINS */
+.packDelivery {
+  display: flex; align-items: center; gap: 4px;
+  font-size: 11px; color: #6b7280;
+  border: 1px solid #e5e7eb; border-radius: 6px;
+  padding: 4px 8px; white-space: nowrap;
+}
+
+/* Green checkmark when selected */
+.packCheck { color: #21B421; font-size: 17px; font-weight: 900; }
+
+/* =========================================================================
+   SHARED SECTION WRAPPER
+   ========================================================================= */
+.section {
+  padding: 36px 0;
+  border-top: 1px solid #f0f0f0;
+}
+
+/* Uniform section heading — left-aligned, no border, bold */
+.sectionHeading {
+  font-size: 20px; font-weight: 800; color: #1a1a1a;
+  margin: 0 0 18px;
+}
+
+/* =========================================================================
+   SECTION 2 — ABOUT PRODUCT
+   ========================================================================= */
+/* Bordered box containing the about text */
+.aboutBox {
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 24px 28px;
+}
+/* "About the product" label — bold grey */
+.aboutLabel {
+  font-size: 14px; font-weight: 700; color: #555;
+  margin: 0 0 12px;
+}
+/* Body text — normal weight, grey, generous line-height */
+.aboutBody {
+  font-size: 14px; color: #555; line-height: 1.75;
+  margin: 0 0 12px;
+}
+/* Recipe link line */
+.aboutRecipe {
+  font-size: 14px; color: #555; margin: 0;
+}
+.recipeLink {
+  color: #21B421; text-decoration: none; word-break: break-all;
+}
+.recipeLink:hover { text-decoration: underline; }
+
+/* =========================================================================
+   SECTION 3 — CUSTOMER REVIEWS
+   ========================================================================= */
+/* Summary row: big score left | bars right */
+.reviewSummaryRow {
+  display: flex; gap: 48px; align-items: flex-start;
+  margin-bottom: 32px; flex-wrap: wrap;
+}
+
+/* Left: big number + stars + count */
+.avgBlock { text-align: center; min-width: 100px; }
+.avgScore {
+  font-size: 56px; font-weight: 900; line-height: 1;
+  color: #1a1a1a; margin-bottom: 4px;
+}
+.reviewCountLabel { font-size: 13px; color: #888; margin-top: 4px; }
+
+/* Right: rating bars 5→1 */
+.barsBlock {
+  flex: 1; min-width: 260px;
+  display: flex; flex-direction: column; gap: 8px;
+}
+.barRow {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 13px; color: #888;
+}
+.barNum { width: 10px; text-align: right; }
+.barTrack {
+  flex: 1; height: 8px;
+  background: #e5e7eb; border-radius: 4px; overflow: hidden;
+}
+.barFill {
+  height: 100%; background: #21B421; border-radius: 4px;
+  transition: width .4s ease;
+}
+.barPct { width: 36px; text-align: right; font-size: 12px; }
+
+/* Stars row */
+.starsRow { display: flex; gap: 2px; }
+.star { cursor: inherit; transition: color .15s; }
+
+/* Individual review cards */
+.reviewList { display: flex; flex-direction: column; gap: 28px; margin-bottom: 32px; }
+.reviewCard { display: flex; gap: 14px; }
+
+/* Circular avatar photo */
+.reviewAvatar {
+  width: 48px; height: 48px; border-radius: 50%;
+  object-fit: cover; flex-shrink: 0;
+}
+/* Fallback initial circle when no avatar image */
+.reviewInitial {
+  width: 48px; height: 48px; border-radius: 50%;
+  background: #21B421; color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; font-weight: 800; flex-shrink: 0;
+}
+
+.reviewContent { flex: 1; }
+.reviewName { font-size: 14px; font-weight: 800; color: #1a1a1a; margin-bottom: 2px; }
+.reviewTime { font-size: 12px; color: #aaa; margin-bottom: 6px; }
+.reviewText { font-size: 14px; color: #555; line-height: 1.65; margin: 6px 0 8px; }
+.reviewReactions { display: flex; gap: 14px; }
+.reactionBtn {
+  background: none; border: none; cursor: pointer;
+  font-size: 13px; color: #6b7280;
+  padding: 3px 8px; border-radius: 6px;
+  transition: background .15s;
+}
+.reactionBtn:hover { background: #f3f4f6; }
+
+.noReviews { font-size: 14px; color: #888; margin-bottom: 28px; }
+
+/* Write-a-review box */
+.writeReviewBox {
+  border: 1px solid #e5e7eb;
+  border-radius: 10px; padding: 24px 28px;
+}
+.writeReviewTitle {
+  font-size: 16px; font-weight: 800; color: #1a1a1a;
+  margin: 0 0 14px;
+}
+.reviewTextarea {
+  display: block; width: 100%;
+  margin-top: 14px;
+  border: 1.5px solid #e5e7eb; border-radius: 8px;
+  padding: 12px; font-size: 14px; font-family: inherit;
+  resize: vertical; min-height: 90px; outline: none;
+  transition: border-color .2s;
+  box-sizing: border-box;
+}
+.reviewTextarea:focus { border-color: #21B421; }
+
+.submitBtn {
+  margin-top: 14px; padding: 11px 26px;
+  background: #21B421; color: #fff;
+  border: none; border-radius: 8px;
+  font-size: 14px; font-weight: 700;
+  cursor: pointer; font-family: inherit;
+  transition: background .2s;
+}
+.submitBtn:hover { background: #1a9c1a; }
+.submitBtn:disabled { background: #86efac; cursor: not-allowed; }
+
+.loginPrompt { font-size: 14px; color: #555; }
+.loginLink { color: #21B421; text-decoration: none; font-weight: 700; }
+.loginLink:hover { text-decoration: underline; }
+
+/* =========================================================================
+   SECTION 4 — PRODUCT SPECIFICATIONS
+   2-col keyed table.  Keys: uppercase tiny grey.  Values: bold black.
+   Alternating row backgrounds. Vertical divider between columns.
+   ========================================================================= */
+.specsTable {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border: 1px solid #e5e7eb;
+  border-radius: 0;
+  overflow: hidden;
+}
+
+/* Each cell */
+.specCell {
+  padding: 18px 22px;
+  border-bottom: 1px solid #e5e7eb;
+}
+/* Left col has a right border = the vertical divider */
+.specCellLeft  { border-right: 1px solid #e5e7eb; }
+.specCellRight { }
+/* Empty padding cell */
+.specCellEmpty { }
+
+/* Key: uppercase, small, grey — exactly as in screenshot */
+.specKey {
+  font-size: 11px; font-weight: 700;
+  color: #9ca3af; text-transform: uppercase;
+  letter-spacing: .6px; margin-bottom: 5px;
+}
+/* Value: normal size, bold black */
+.specVal {
+  font-size: 14px; font-weight: 600; color: #1a1a1a;
+}
+
+/* =========================================================================
+   SECTION 5 — RELATED PRODUCTS
+   3-col card grid. Large image + name + price string (₹ 100 / 500g).
+   ========================================================================= */
+.relatedGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+
+.relatedCard {
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  overflow: hidden;
+  cursor: pointer;
+  background: #fff;
+  transition: box-shadow .2s, transform .2s;
+  outline: none;
+}
+.relatedCard:hover {
+  box-shadow: 0 6px 24px rgba(0,0,0,.1);
+  transform: translateY(-2px);
+}
+
+.relatedImgWrap {
+  width: 100%; aspect-ratio: 4/3;
+  background: #f5f5f5; overflow: hidden;
+}
+.relatedImgWrap img {
+  width: 100%; height: 100%;
+  object-fit: cover; display: block;
+  transition: transform .3s;
+}
+.relatedCard:hover .relatedImgWrap img { transform: scale(1.04); }
+
+.relatedInfo { padding: 14px 16px; }
+.relatedName {
+  font-size: 14px; font-weight: 700; color: #1a1a1a;
+  margin-bottom: 5px; line-height: 1.3;
+}
+/* Price string: "₹ 100 / 500g" */
+.relatedPrice {
+  font-size: 13px; color: #555;
+}
+
+.outOfStockText {
+  color: #e74c3c;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.lowStockText {
+  color: #f39c12;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.disabledBtn {
+  background: #ccc !important;
+  cursor: not-allowed;
+}
+
+.packDisabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  border: 1px dashed #ccc;
+}
+
+/* =========================================================================
+   RESPONSIVE
+   ========================================================================= */
+@media (max-width: 1024px) {
+  .heroWrap { grid-template-columns: 90px 1fr 1fr; gap: 16px; }
+}
+
+@media (max-width: 768px) {
+  .heroWrap { grid-template-columns: 1fr; }
+
+  /* On mobile: thumbnails become a horizontal scroll row */
+  .thumbCol {
+    flex-direction: row;
+    overflow-x: auto;
+    gap: 8px;
+    scrollbar-width: none;
+    order: 2;     /* after main image */
+  }
+  .thumbCol::-webkit-scrollbar { display: none; }
+
+  .mainImgCol { order: 1; }
+  .infoCol    { order: 3; }
+
+  .mainImg { height: 300px; }
+  .relatedGrid { grid-template-columns: repeat(2, 1fr); }
+  .specsTable { grid-template-columns: 1fr; }
+  .specCellLeft { border-right: none; }
+  .reviewSummaryRow { gap: 24px; }
+}
+
+@media (max-width: 480px) {
+  .relatedGrid  { grid-template-columns: 1fr; }
+  .ctaRow       { flex-direction: column; }
+  .btnAdd, .btnSave { width: 100%; justify-content: center; }
+  .packItem     { grid-template-columns: 1fr auto auto; }
+  .packCheck    { display: none; }
+  .avgScore     { font-size: 44px; }
+  .barsBlock    { min-width: 200px; }
+}

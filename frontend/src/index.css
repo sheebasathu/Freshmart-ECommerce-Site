@@ -1,0 +1,48 @@
+/* ── Reset ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { font-family: 'Nunito', sans-serif; background: #fff; color: #1a1a1a; }
+a { text-decoration: none; color: inherit; }
+button { font-family: inherit; cursor: pointer; border: none; background: none; }
+img { display: block; max-width: 100%; }
+ul { list-style: none; }
+
+/* ── Variables ── */
+:root {
+  --green: #21B421;
+  --green-dark: #237a3d;
+  --green-bg: #f0fdf4;
+  --red: #c0392b;
+  --red-hover: #a93226;
+  --text: #1a1a1a;
+  --text-mid: #555;
+  --text-grey: #888;
+  --text-light: #aaa;
+  --border: #e8e8e8;
+  --bg: #ebebeb;
+  --shadow: 0 2px 12px rgba(0,0,0,0.08);
+  --shadow-lg: 0 8px 28px rgba(0,0,0,0.13);
+  --r-sm: 6px;
+  --r-md: 10px;
+  --r-lg: 14px;
+  --r-full: 10px;
+  --max-w: 1400px;
+  --px: 40px;
+}
+
+.wrap { max-width: var(--max-w); margin: 0 auto; padding-left: var(--px); padding-right: var(--px); }
+
+/* ── Toast ── */
+.toast {
+  position: fixed; bottom: 24px; right: 24px;
+  background: #1a1a1a; color: #fff; padding: 12px 20px;
+  border-radius: 8px; font-size: 14px; font-weight: 600;
+  z-index: 9999; animation: slideUp 0.3s ease;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+}
+@keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+/* ── Responsive ── */
+@media (max-width: 1024px) { :root { --px: 20px; } }
+@media (max-width: 768px)  { :root { --px: 16px; } }
+@media (max-width: 425px)  { :root { --px: 12px; } }

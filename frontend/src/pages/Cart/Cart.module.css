@@ -1,0 +1,719 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   Cart.module.css
+   Replicates screenshots exactly:
+     Screenshot 1975 — Empty basket (green-tinted background, SVG basket, accent text, dark-red button)
+     Screenshot 1976 — Filled basket ("Your Basket", breadcrumb, Delivery-1 group card,
+                        ITEMS/QUANTITY/SUB-TOTAL table, savings tag, stepper, sticky bottom bar)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   SHARED — breadcrumb, page title
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #6b7280;
+  padding: 18px 0 6px;
+}
+
+.breadcrumb a {
+  color: #6b7280;
+  text-decoration: none;
+}
+.breadcrumb a:hover { color: #21B421; }
+
+.sep { color: #d1d5db; }
+
+.crumbCur {
+  color: #374151;
+  font-weight: 600;
+}
+
+.pageTitle {
+  font-size: 26px;
+  font-weight: 800;
+  color: #111827;
+  margin: 0 0 24px;
+  letter-spacing: -0.3px;
+}
+
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   EMPTY STATE — screenshot 1975
+   Layout: white page background, title at top-left, then a large centred card
+   with a very light green (#f0f9f0) background, basket SVG, descriptive text,
+   dark-red "Continue Shopping" button.
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.emptyPage {
+  min-height: 100vh;
+  background: #f9fafb;
+  padding: 0 40px 80px;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+/* The green-tinted card that holds the illustration */
+.emptyBox {
+  background: #f0faf0;           /* very light green — matches screenshot */
+  border-radius: 12px;
+  min-height: 480px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  padding: 60px 40px;
+  margin-top: 8px;
+}
+
+/* "Let's fill the empty Basket" */
+.emptyMsg {
+  font-size: 20px;
+  font-weight: 500;
+  color: #6b7280;
+  margin: 0;
+  text-align: center;
+  line-height: 1.4;
+}
+
+/* "Basket" word in green */
+.emptyAccent {
+  color: #21B421;
+  font-weight: 700;
+}
+
+/* "Continue Shopping" — dark brownish-red from screenshot */
+.continueBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 40px;
+  background: #b33a2a;           /* dark red exactly as in screenshot */
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.2s;
+  font-family: inherit;
+  min-width: 200px;
+  letter-spacing: 0.2px;
+}
+.continueBtn:hover { background: #922f21; }
+
+/* Login link inside empty message */
+.loginLink {
+  color: #21B421;
+  font-weight: 700;
+  text-decoration: none;
+}
+.loginLink:hover { text-decoration: underline; }
+
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   LOADING STATE
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.loadingPage {
+  min-height: 60vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  background: #f9fafb;
+  color: #6b7280;
+  font-size: 15px;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #e5e7eb;
+  border-top-color: #21B421;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   FILLED CART — outer page wrapper
+   The page has padding-bottom = height of the sticky bottom bar so content
+   doesn't get hidden behind it.
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.page {
+  background: #f4f6f4;           /* very light grey-green page background — screenshot */
+  min-height: 100vh;
+  padding: 0 40px 110px;        /* 110px = approx height of bottom bar */
+  max-width: 1280px;
+  margin: 0 auto;
+  position: relative;
+}
+
+/* Scrollable area above sticky bar */
+.cartBody {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   DELIVERY GROUP CARD  — the white card with border in screenshot 1976
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.deliveryGroup {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+/* ── Group header: "Delivery 1" + "1 Product" + collapse chevron ── */
+.groupHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  border-bottom: 1px solid #f3f4f6;
+  background: #fff;
+}
+
+.groupLeft {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+/* "Delivery 1" bold */
+.groupTitle {
+  font-size: 16px;
+  font-weight: 800;
+  color: #111827;
+  letter-spacing: -0.2px;
+}
+
+/* "1 Product" grey */
+.groupCount {
+  font-size: 13px;
+  color: #9ca3af;
+  font-weight: 500;
+}
+
+/* Down-chevron collapse button */
+.collapseBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #9ca3af;
+  font-size: 13px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: background 0.15s;
+  line-height: 1;
+}
+.collapseBtn:hover { background: #f3f4f6; }
+
+
+/* ── Savings tag: green check + "Har Din Sasta!" — screenshot row ── */
+.savingsTag {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: #f0faf0;
+  border-bottom: 1px solid #d1fae5;
+  font-size: 13px;
+  font-weight: 600;
+  color: #166534;
+}
+
+.savingsCheck {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  background: #21B421;
+  color: #fff;
+  border-radius: 50%;
+  font-size: 11px;
+  flex-shrink: 0;
+}
+
+.savingsAmt {
+  font-weight: 400;
+  color: #6b7280;
+  font-size: 12px;
+}
+
+
+/* ── Table column header row: ITEMS / QUANTITY / SUB-TOTAL ── */
+.tableHeader {
+  display: grid;
+  grid-template-columns: 1fr 180px 160px;
+  padding: 10px 20px;
+  background: #f9fafb;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.colItems,
+.colQty,
+.colSub {
+  font-size: 11px;
+  font-weight: 700;
+  color: #9ca3af;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+}
+
+.colQty  { text-align: center; }
+.colSub  { text-align: right; }
+
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   ITEM LIST — one row per cart item
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.itemList {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Each item row — 3-column grid matching the header */
+.itemRow {
+  display: grid;
+  grid-template-columns: 1fr 180px 160px;
+  align-items: center;
+  padding: 18px 20px;
+  border-bottom: 1px solid #f3f4f6;
+  transition: background 0.15s;
+}
+.itemRow:last-child { border-bottom: none; }
+.itemRow:hover { background: #fafafa; }
+
+/* Faded opacity when "saved for later" */
+.itemSaved { opacity: 0.55; }
+
+
+/* ── Item cell (image + text info) ── */
+.itemCell {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.imgBox {
+  flex-shrink: 0;
+  width: 88px;
+  height: 88px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #f3f4f6;
+  border: 1px solid #e5e7eb;
+}
+
+.itemImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.itemInfo {
+  flex: 1;
+  min-width: 0;
+  padding-top: 2px;
+}
+
+/* Product name */
+.itemName {
+  font-size: 15px;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 6px;
+  line-height: 1.35;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Price + strikethrough MRP row */
+.itemPriceRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+/* Current selling price  "₹ 124" */
+.itemPrice {
+  font-size: 15px;
+  font-weight: 700;
+  color: #111827;
+}
+
+/* Strikethrough MRP  "₹177" */
+.itemMrp {
+  font-size: 13px;
+  color: #9ca3af;
+  text-decoration: line-through;
+  font-weight: 400;
+}
+
+/* "Delete | Save for later" action links */
+.itemActions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.actionLink {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+  color: #6b7280;
+  padding: 0;
+  font-family: inherit;
+  transition: color 0.15s;
+  line-height: 1;
+}
+.actionLink:hover { color: #374151; text-decoration: underline; }
+
+.actionDivider {
+  color: #d1d5db;
+  font-size: 13px;
+  user-select: none;
+}
+
+.actionSaved {
+  color: #21B421;
+  font-weight: 600;
+}
+
+
+/* ── Quantity stepper cell ── */
+.qtyCell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Pill-shaped stepper: "−  1  +" */
+.stepper {
+  display: inline-flex;
+  align-items: center;
+  border: 1.5px solid #d1d5db;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.stepBtn {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  font-weight: 700;
+  color: #374151;
+  transition: background 0.15s;
+  line-height: 1;
+}
+.stepBtn:hover { background: #f3f4f6; }
+
+.stepCount {
+  min-width: 40px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 700;
+  color: #111827;
+  border-left: 1px solid #e5e7eb;
+  border-right: 1px solid #e5e7eb;
+  padding: 0 6px;
+  line-height: 36px;
+}
+
+
+/* ── Sub-total cell ── */
+.subCell {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 3px;
+}
+
+/* "₹124" large bold */
+.subTotal {
+  font-size: 16px;
+  font-weight: 800;
+  color: #111827;
+}
+
+/* "Saved: ₹53" in green */
+.subSaved {
+  font-size: 12px;
+  font-weight: 600;
+  color: #21B421;
+}
+
+
+/* ── Clear basket link at bottom of group ── */
+.clearRow {
+  padding: 10px 20px 14px;
+  display: flex;
+  justify-content: flex-start;
+  border-top: 1px solid #f3f4f6;
+}
+
+.clearBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+  color: #c0392b;
+  font-weight: 600;
+  padding: 0;
+  font-family: inherit;
+  transition: color 0.15s;
+}
+.clearBtn:hover { color: #9b2335; text-decoration: underline; }
+
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   STICKY BOTTOM BAR — screenshot 1976 (dark bar at bottom of viewport)
+   Three zones: left (subtotal + savings chip) | centre (delivery type) | right (checkout btn)
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.bottomBar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 200;
+  background: #696a6a;           /* very dark green-black — matches screenshot */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 40px;
+  height: 88px;
+  gap: 24px;
+  box-shadow: 0 -4px 20px rgba(0,0,0,0.25);
+}
+
+
+/* ── Left zone: Subtotal + Savings chip ── */
+.barLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 160px;
+}
+
+.barSubtotal {
+  font-size: 16px;
+  font-weight: 400;
+  color: #e5e7eb;
+  margin: 0;
+  letter-spacing: 0.1px;
+}
+.barSubtotal strong {
+  font-weight: 800;
+  color: #fff;
+}
+
+/* "Savings: ₹53" green pill chip */
+.savingsChip {
+  display: inline-flex;
+  align-items: center;
+  background: #21B421;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 20px;
+  align-self: flex-start;
+}
+
+
+/* ── Centre zone: "CHOOSE DELIVERY TYPE" label + option buttons ── */
+.barCenter {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+}
+
+/* "CHOOSE DELIVERY TYPE" uppercase label */
+.deliveryLabel {
+  font-size: 10px;
+  font-weight: 700;
+  color: #9ca3af;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.deliveryOptions {
+  display: flex;
+  gap: 10px;
+}
+
+/* Each delivery option button (white card pill) */
+.deliveryOpt {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 18px;
+  background: #2e3532;           /* slightly lighter than bar for inactive */
+  border: 1.5px solid #3a4440;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.18s;
+  font-family: inherit;
+  min-width: 110px;
+}
+.deliveryOpt:hover {
+  background: #3a4440;
+  border-color: #4b5563;
+}
+
+/* Active delivery option — white card exactly like screenshot "Later" */
+.deliveryActive {
+  background: #fff;
+  border-color: #fff;
+}
+.deliveryActive .deliveryOptLabel { color: #111827; }
+.deliveryActive .deliveryOptSub   { color: #6b7280; }
+.deliveryActive .deliveryIcon     { color: #374151; }
+
+.deliveryIcon {
+  font-size: 18px;
+  flex-shrink: 0;
+  color: #9ca3af;
+  line-height: 1;
+}
+
+.deliveryOptText {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  text-align: left;
+}
+
+.deliveryOptLabel {
+  font-size: 13px;
+  font-weight: 700;
+  color: #e5e7eb;
+  line-height: 1.2;
+}
+
+.deliveryOptSub {
+  font-size: 11px;
+  color: #9ca3af;
+  line-height: 1.2;
+}
+
+
+/* ── Right zone: "Proceed to Checkout" button ── */
+.barRight {
+  display: flex;
+  align-items: center;
+  min-width: 220px;
+  justify-content: flex-end;
+}
+
+/* Dark red button — matches screenshot */
+.checkoutBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 32px;
+  background: #b33a2a;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s;
+  white-space: nowrap;
+  font-family: inherit;
+  letter-spacing: 0.2px;
+}
+.checkoutBtn:hover { background: #922f21; }
+
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   RESPONSIVE
+   ───────────────────────────────────────────────────────────────────────────── */
+
+@media (max-width: 1024px) {
+  .page, .emptyPage { padding-left: 24px; padding-right: 24px; }
+  .bottomBar         { padding: 0 24px; }
+}
+
+@media (max-width: 860px) {
+  /* Stack table columns */
+  .tableHeader { display: none; }         /* hide column headers on mobile */
+
+  .itemRow {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .qtyCell { justify-content: flex-start; }
+  .subCell  { align-items: flex-start; }
+
+  /* Bottom bar stacks */
+  .bottomBar {
+    flex-direction: column;
+    height: auto;
+    padding: 16px 20px;
+    gap: 14px;
+  }
+
+  .barLeft, .barCenter, .barRight { width: 100%; }
+
+  .deliveryOptions { justify-content: center; }
+
+  .barRight { justify-content: center; }
+
+  .checkoutBtn { width: 100%; }
+
+  .page { padding-bottom: 260px; }   /* taller bar when stacked */
+}
+
+@media (max-width: 600px) {
+  .pageTitle  { font-size: 22px; }
+  .emptyMsg   { font-size: 17px; }
+  .continueBtn { padding: 13px 28px; font-size: 14px; }
+
+  .imgBox { width: 72px; height: 72px; }
+  .itemName { font-size: 14px; }
+}
+
+@media (max-width: 425px) {
+  .page, .emptyPage { padding-left: 16px; padding-right: 16px; }
+  .groupHeader { padding: 12px 16px; }
+  .itemRow     { padding: 14px 16px; }
+  .clearRow    { padding: 8px 16px 12px; }
+  .tableHeader { padding: 8px 16px; }
+  .savingsTag  { padding: 8px 16px; }
+}
