@@ -21,8 +21,9 @@ class BaseCardSection(models.Model):
     subcategory = models.ForeignKey(
     'products.SubCategory', on_delete=models.SET_NULL, null=True, blank=True
     )
-    image    = models.ImageField(upload_to='card_sections/')
-    badge    = models.CharField(
+    image_file = models.ImageField(upload_to='card_sections/', blank=True, null=True)
+    image = models.URLField(blank=True, null=True)
+    badge      = models.CharField(
         max_length=100, blank=True,
         help_text='Short label shown on the card, e.g. "MIN 27% OFF" or "NEW".'
     )
@@ -31,17 +32,27 @@ class BaseCardSection(models.Model):
     class Meta:
         abstract = True
         ordering = ['order']
-    def __str__(self):
-        return self.title
     
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        
+        if self.image_file:
+            new_url = self.image_file.url
+            if self.image != new_url:
+                self.image = new_url
+                super().save(update_fields=['image'])# store local URL
     def clean(self):
         from django.core.exceptions import ValidationError
-
+    
         if self.subcategory and self.category:
             if self.subcategory.category_id != self.category_id:
                 raise ValidationError(
                     "Subcategory must belong to the selected category."
                 )
+                      
+    def __str__(self):
+            return self.title
+        
 
 class FruitsVegetableCard(BaseCardSection):
     """
@@ -90,7 +101,8 @@ class Banner(models.Model):
     subtitle        = models.CharField(max_length=300, blank=True)
     description     = models.CharField(max_length=500, blank=True,
                                         help_text='Body paragraph shown below the subtitle.')
-    image           = models.ImageField(upload_to='banners/')
+    image_file      = models.ImageField(upload_to='banners/', blank=True, null=True)
+    image = models.URLField(blank=True, null=True)
     cta_text        = models.CharField(max_length=100, blank=True, default='Shop Now')
     cta_link        = models.CharField(max_length=300, blank=True,
                                         help_text='Relative path or full URL for the CTA button.')
@@ -101,7 +113,15 @@ class Banner(models.Model):
     class Meta:
         db_table = 'fm_banners'
         ordering = ['order']
-
+        
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        if self.image_file:
+            new_url = self.image_file.url
+            if self.image != new_url:
+                self.image = new_url
+                super().save(update_fields=['image'])
+            
     def __str__(self):
         return f'[{self.placement}] {self.title}'
 
@@ -114,7 +134,8 @@ class FeaturedSection(models.Model):
     """Featured Offers grid on homepage — each card links to a category."""
     title        = models.CharField(max_length=200)
     subtitle     = models.CharField(max_length=300, blank=True)
-    image        = models.ImageField(upload_to='featured/')
+    image_file  = models.ImageField(upload_to='featured/', blank=True, null=True)
+    image = models.URLField(blank=True, null=True)
     category     = models.ForeignKey(
         'products.Category', on_delete=models.SET_NULL, null=True, blank=True
     )
@@ -127,6 +148,23 @@ class FeaturedSection(models.Model):
     class Meta:
         db_table = 'fm_featured_sections'
         ordering = ['order']
+        
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        if self.image_file:
+            new_url = self.image_file.url
+            if self.image != new_url:
+                self.image = new_url
+                super().save(update_fields=['image'])
+        
+    def clean(self):
+        from django.core.exceptions import ValidationError
+
+        if self.subcategory and self.category:
+            if self.subcategory.category_id != self.category_id:
+                raise ValidationError(
+                    "Subcategory must belong to the selected category."
+                )
 
     def __str__(self):
         return self.title
@@ -144,10 +182,7 @@ class NavCategory(models.Model):
     Links to a products.Category or an arbitrary custom path.
     Supports future subcategory nesting via the parent FK.
     """
-    icon        = models.ImageField(
-        upload_to='nav_icons/', blank=True, null=True,
-        help_text='Square icon image shown in the dropdown (64×64 px recommended).'
-    )
+    icon = models.ImageField(upload_to='nav_icons/', blank=True, null=True)
     icon_emoji  = models.CharField(
         max_length=10, blank=True,
         help_text='Fallback emoji if no image icon is uploaded (e.g. 🥦).'
@@ -246,15 +281,24 @@ class NavMenu(models.Model):
 
 class ShopCategory(models.Model):
     """Shop-by-Category grid on homepage — admin sets image per category."""
-    category  = models.OneToOneField('products.Category', on_delete=models.CASCADE)
-    image     = models.ImageField(upload_to='shop_categories/')
-    is_active = models.BooleanField(default=True)
-    order     = models.PositiveIntegerField(default=0)
+    category    = models.OneToOneField('products.Category', on_delete=models.CASCADE)
+    image_file  = models.ImageField(upload_to='shop_categories/', blank=True, null=True)
+    image = models.URLField(blank=True, null=True)
+    is_active   = models.BooleanField(default=True)
+    order       = models.PositiveIntegerField(default=0)
 
     class Meta:
         db_table = 'fm_shop_categories'
         ordering = ['order']
 
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        if self.image_file:
+            new_url = self.image_file.url
+            if self.image != new_url:
+                self.image = new_url
+                super().save(update_fields=['image'])
+            
     def __str__(self):
         return str(self.category)
 

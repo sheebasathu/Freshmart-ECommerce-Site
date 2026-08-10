@@ -4,20 +4,34 @@ from django.utils.html import format_html
 from .models import Banner, FeaturedSection, NavCategory, NavMenu, ShopCategory, PopularCategoryPill, FruitsVegetableCard, DailyDealCard
 
 def img_preview(obj):
-    if obj.image: return format_html('<img src="{}" height="50" style="border-radius:4px"/>', obj.image.url)
+    try:
+        if obj.image and hasattr(obj.image, 'url'):
+            return format_html(
+                '<a href="{}" target="_blank">'
+                '<img src="{}" height="50" style="border-radius:6px;" />'
+                '</a>',
+                obj.image.url,
+                obj.image.url
+            )
+    except Exception:
+        return '⚠️ Error'
     return '—'
+
 img_preview.short_description = 'Preview'
 
 def icon_preview(obj):
-    """Icon preview for NavCategory (uses `icon` ImageField)."""
-    if obj.icon:
-        return format_html(
-            '<img src="{}" height="40" width="40" '
-            'style="border-radius:6px; object-fit:cover;"/>',
-            obj.icon.url,
-        )
-    # Fall back to emoji if no image uploaded
+    try:
+        if obj.icon and hasattr(obj.icon, 'url'):
+            return format_html(
+                '<img src="{}" height="40" width="40" '
+                'style="border-radius:6px; object-fit:cover;" />',
+                obj.icon.url,
+            )
+    except Exception:
+        return '⚠️ Error'
+
     return obj.icon_emoji or '—'
+
 icon_preview.short_description = 'Icon'
 
  
@@ -28,7 +42,27 @@ class BannerAdmin(admin.ModelAdmin):
     list_filter   = ['placement','is_active']
     search_fields = ['title', 'subtitle']
     ordering      = ['placement', 'order']
+    readonly_fields = ['image']
     
+    fieldsets = (
+        ('Content', {
+            'fields': (
+                'title', 'highlight_title', 'highlight_color',
+                'subtitle', 'description'
+            )
+        }),
+        ('Image', {
+            'fields': ('image_file', 'image'),
+            'description': 'Upload image (stored locally or via configured storage).'
+        }),
+        ('CTA', {
+            'fields': ('cta_text', 'cta_link')
+        }),
+        ('Display', {
+            'fields': ('placement', 'is_active', 'order')
+        }),
+    )
+
 
 @admin.register(FeaturedSection)
 class FeaturedSectionAdmin(admin.ModelAdmin):
@@ -36,8 +70,19 @@ class FeaturedSectionAdmin(admin.ModelAdmin):
     list_editable = ['is_active','order']
     search_fields = ['title']
     autocomplete_fields = ['category','subcategory']
+    readonly_fields = ['image']
     
-    
+    fieldsets = (
+        ('Content', {
+            'fields': ('title', 'subtitle', 'category', 'subcategory')
+        }),
+        ('Image', {
+            'fields': ('image_file', 'image')
+        }),
+        ('Display', {
+            'fields': ('is_active', 'order')
+        }),
+    )
     
 class NavCategoryChildInline(admin.TabularInline):
     """
@@ -47,7 +92,8 @@ class NavCategoryChildInline(admin.TabularInline):
     model           = NavCategory
     fk_name         = 'parent'
     extra           = 1
-    fields          = ['name', 'icon', 'icon_emoji', 'description', 'category', 'custom_path', 'is_active', 'order']
+    fields          = ['name', 'icon_file', 'icon', 'icon_emoji', 'description', 'category', 'custom_path', 'is_active', 'order']
+    readonly_fields = ['icon']
     show_change_link = True
     verbose_name        = 'Sub-category'
     verbose_name_plural = 'Sub-categories'
@@ -56,19 +102,20 @@ class NavCategoryChildInline(admin.TabularInline):
 @admin.register(NavCategory)
 class NavCategoryAdmin(admin.ModelAdmin):
     list_display  = [
-        icon_preview, 'name', 'description',
-        'category', 'parent', 'custom_path', 'is_active', 'order',
+        icon_preview, 'name', 'category', 'parent', 'custom_path', 'is_active', 'order',
     ]
     list_editable  = ['is_active', 'order']
     list_filter    = ['is_active', 'parent']
     search_fields  = ['name', 'description']
     ordering       = ['order']
     # Only show top-level entries by default; children are edited via inline
+    autocomplete_fields = ['category', 'parent']
+    readonly_fields = ['icon']
     inlines        = [NavCategoryChildInline]
  
     fieldsets = (
         ('Display', {
-            'fields': ('name', 'icon', 'icon_emoji', 'description'),
+            'fields': ('name', 'icon_file', 'icon', 'icon_emoji', 'description'),
         }),
         ('Link', {
             'fields': ('category', 'custom_path'),
@@ -100,6 +147,7 @@ class NavMenuAdmin(admin.ModelAdmin):
     list_filter    = ['is_active']
     search_fields  = ['title', 'slug']
     ordering       = ['order']
+    autocomplete_fields = ['subcategory']
     prepopulated_fields = {'slug': ('title',)}   # auto-fills slug from title
  
     fieldsets = (
@@ -125,6 +173,20 @@ class ShopCategoryAdmin(admin.ModelAdmin):
     list_editable = ['is_active','order']
     search_fields  = ['category__name']
     autocomplete_fields = ['category']
+    readonly_fields = ['image']
+    ordering = ['order']
+    
+    fieldsets = (
+        ('Content', {
+            'fields': ('category',)
+        }),
+        ('Image', {
+            'fields': ('image_file', 'image')
+        }),
+        ('Display', {
+            'fields': ('is_active', 'order')
+        }),
+    )
 
 @admin.register(PopularCategoryPill)
 class PopularCategoryPillAdmin(admin.ModelAdmin):
@@ -147,10 +209,14 @@ class FruitsVegetableCardAdmin(admin.ModelAdmin):
     search_fields = ['title', 'subtitle', 'badge']
     ordering      = ['order']
     autocomplete_fields = ['category', 'subcategory']
+    readonly_fields = ['image']
         
     fieldsets = (
         ('Card Content', {
-            'fields': ('title', 'subtitle', 'category', 'subcategory', 'image', 'badge'),
+            'fields': ('title', 'subtitle', 'category', 'subcategory', 'badge'),
+        }),
+        ('Image', {
+            'fields': ('image_file', 'image')
         }),
         ('Visibility', {
             'fields': ('is_active', 'order'),
@@ -173,11 +239,15 @@ class DailyDealCardAdmin(admin.ModelAdmin):
     search_fields = ['title', 'subtitle', 'badge', 'description']
     ordering      = ['order']
     autocomplete_fields = ['category', 'subcategory']
+    readonly_fields = ['image']
  
     fieldsets = (
         ('Card Content', {
-            'fields': ('title', 'subtitle', 'category', 'subcategory', 'description', 'image', 'badge'),
+            'fields': ('title', 'subtitle', 'category', 'subcategory', 'description', 'badge'),
             'description': '"Description" is the longer body text shown under the subtitle.',
+        }),
+        ('Image', {
+            'fields': ('image_file', 'image')
         }),
         ('Visibility', {
             'fields': ('is_active', 'order'),

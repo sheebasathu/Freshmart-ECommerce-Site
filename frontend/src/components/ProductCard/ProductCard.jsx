@@ -59,7 +59,7 @@ export default function ProductCard({ product }) {
   const handlePlus = (e) => {
     e.preventDefault()
     if (!cartItem) return
-     if (qty >= opt.stock) return
+    if (qty >= opt.stock) return
     setQty(cartItem.id, qty + 1)
   }
 
@@ -84,7 +84,14 @@ export default function ProductCard({ product }) {
 
       <div className={styles.imgFrame}>
         {/* Primary Image */}
-        <img className={styles.imgA} src={imgA} alt={product.name} loading="lazy" />
+        <img
+          className={styles.imgA}
+          src={imgA}
+          alt={product.name}
+          loading="lazy"
+          onError={(e) => {
+            e.target.src = '/images/capsicumdefault.png'
+          }} />
 
         {/* Hover Image */}
         {imgB && (

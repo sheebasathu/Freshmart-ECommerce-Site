@@ -6,12 +6,11 @@ from .models import (
     FruitsVegetableCard, DailyDealCard
 )
 
-def abs_url(obj, field, context):
-    """Return absolute URL for an ImageField, or None."""
-    req = context.get('request')
-    val = getattr(obj, field, None)
-    return req.build_absolute_uri(val.url) if (val and req) else None
-
+# ✅ helper for Django ImageField
+def build_url(request, url):
+    if not url:
+        return None
+    return request.build_absolute_uri(url) if request else url
 # ─────────────────────────────────────────────────────────────────────────────
 # Banner
 # ─────────────────────────────────────────────────────────────────────────────
@@ -27,7 +26,19 @@ class BannerSerializer(serializers.ModelSerializer):
             'cta_text', 'cta_link', 'placement', 'order',
         ]
     def get_image_url(self, obj):
-        return abs_url(obj, 'image', self.context)
+        request = self.context.get("request")
+
+        if not obj.image:
+            return None
+
+        try:
+            # if it's ImageField
+            if hasattr(obj.image, "url"):
+                return request.build_absolute_uri(obj.image.url)
+            # if it's already URLField
+            return request.build_absolute_uri("/media/" + str(obj.image))
+        except Exception:
+            return None
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Featured section
@@ -40,8 +51,8 @@ class FeaturedSectionSerializer(serializers.ModelSerializer):
       /listing?category=<slug>&subcategory=<slug>
     """
     image_url         = serializers.SerializerMethodField()
-    category_slug     = serializers.CharField(source='category.slug',     read_only=True)
-    subcategory_slug = serializers.CharField(source='subcategory.slug', read_only=True, default=None)
+    category_slug     = serializers.SerializerMethodField()
+    subcategory_slug = serializers.SerializerMethodField()
     class Meta:
         model  = FeaturedSection
         fields = [
@@ -49,7 +60,24 @@ class FeaturedSectionSerializer(serializers.ModelSerializer):
             'category_slug', 'subcategory_slug', 'order',
         ]
     def get_image_url(self, obj):
-        return abs_url(obj, 'image', self.context)
+            request = self.context.get("request")
+    
+            if not obj.image:
+                return None
+    
+            try:
+                # if it's ImageField
+                if hasattr(obj.image, "url"):
+                    return request.build_absolute_uri(obj.image.url)
+                # if it's already URLField
+                return request.build_absolute_uri("/media/" + str(obj.image))
+            except Exception:
+                return None
+    def get_category_slug(self, obj):
+        return obj.category.slug if obj.category else None
+
+    def get_subcategory_slug(self, obj):
+        return obj.subcategory.slug if obj.subcategory else None
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Navigation serializers
@@ -63,7 +91,15 @@ class NavCategoryChildSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'icon_url', 'icon_emoji', 'description', 'path', 'order']
 
     def get_icon_url(self, obj):
-        return abs_url(obj, 'icon', self.context)
+        request = self.context.get("request")
+
+        try:
+            if obj.icon and hasattr(obj.icon, "url"):
+                return build_url(request, obj.icon.url)
+        except Exception:
+            pass
+
+        return None
 
 class NavCategorySerializer(serializers.ModelSerializer):
     path     = serializers.CharField(read_only=True)
@@ -78,7 +114,7 @@ class NavCategorySerializer(serializers.ModelSerializer):
         ]
 
     def get_icon_url(self, obj):
-        return abs_url(obj, 'icon', self.context)
+        return build_url(self.context.get("request"), obj.icon.url if obj.icon else None)
 
     def get_children(self, obj):
         qs = obj.children.filter(is_active=True).order_by('order')
@@ -92,23 +128,61 @@ class NavMenuSerializer(serializers.ModelSerializer):
         model  = NavMenu
         fields = ['id', 'title', 'slug', 'path', 'order']
 
-
 # ─────────────────────────────────────────────────────────────────────────────
 # Homepage grid serializers
 # ─────────────────────────────────────────────────────────────────────────────
 
 class ShopCategorySerializer(serializers.ModelSerializer):
     image_url     = serializers.SerializerMethodField()
-    category_name = serializers.CharField(source='category.name', read_only=True)
-    category_slug = serializers.CharField(source='category.slug', read_only=True)
-    category_icon = serializers.CharField(source='category.icon', read_only=True)
+    category_name = serializers.SerializerMethodField()
+    category_slug = serializers.SerializerMethodField()
+    category_icon = serializers.SerializerMethodField()
 
     class Meta:
         model  = ShopCategory
         fields = ['id', 'category_name', 'category_slug', 'category_icon', 'image_url', 'order']
 
     def get_image_url(self, obj):
-        return abs_url(obj, 'image', self.context)
+            request = self.context.get("request")
+    
+            if not obj.image:
+                return None
+    
+            try:
+                # if it's ImageField
+                if hasattr(obj.image, "url"):
+                    return request.build_absolute_uri(obj.image.url)
+                # if it's already URLField
+                return request.build_absolute_uri("/media/" + str(obj.image))
+            except Exception:
+                return None
+    def get_category_name(self, obj):
+        return obj.category.name if obj.category else None
+
+    def get_category_slug(self, obj):
+        try:
+            return obj.category.slug if obj.category else None
+        except Exception:
+            return None
+
+    def get_category_icon(self, obj):
+        request = self.context.get("request")
+
+        if not obj.category or not obj.category.icon:
+            return None
+
+        try:
+            icon = obj.category.icon
+
+        # If it's ImageField
+            if hasattr(icon, "url"):
+                return request.build_absolute_uri(icon.url)
+
+        # If it's already string (URL or path)
+            return icon
+
+        except Exception:
+            return None
 
 class PopularPillSerializer(serializers.ModelSerializer):
     path = serializers.CharField(read_only=True)
@@ -124,8 +198,8 @@ class PopularPillSerializer(serializers.ModelSerializer):
 
 class FruitsVegetableCardSerializer(serializers.ModelSerializer):
     image_url         = serializers.SerializerMethodField()
-    category_slug     = serializers.CharField(source='category.slug',     read_only=True, default=None)
-    subcategory_slug = serializers.CharField(source='subcategory.slug', read_only=True, default=None)
+    category_slug     = serializers.SerializerMethodField()
+    subcategory_slug = serializers.SerializerMethodField()
 
     class Meta:
         model  = FruitsVegetableCard
@@ -136,13 +210,34 @@ class FruitsVegetableCardSerializer(serializers.ModelSerializer):
         ]
 
     def get_image_url(self, obj):
-        return abs_url(obj, 'image', self.context)
-
+            request = self.context.get("request")
+    
+            if not obj.image:
+                return None
+    
+            try:
+                # if it's ImageField
+                if hasattr(obj.image, "url"):
+                    return request.build_absolute_uri(obj.image.url)
+                # if it's already URLField
+                return request.build_absolute_uri("/media/" + str(obj.image))
+            except Exception:
+                return None
+    def get_category_slug(self, obj):
+        try:
+            return obj.category.slug if obj.category else None
+        except Exception:
+            return None
+    def get_subcategory_slug(self, obj):
+        try:
+            return obj.subcategory.slug if obj.subcategory else None
+        except Exception:
+            return None
 
 class DailyDealCardSerializer(serializers.ModelSerializer):
     image_url         = serializers.SerializerMethodField()
-    category_slug     = serializers.CharField(source='category.slug',     read_only=True, default=None)
-    subcategory_slug = serializers.CharField(source='subcategory.slug', read_only=True, default=None)
+    category_slug     = serializers.SerializerMethodField()
+    subcategory_slug = serializers.SerializerMethodField()
 
     class Meta:
         model  = DailyDealCard
@@ -153,5 +248,28 @@ class DailyDealCardSerializer(serializers.ModelSerializer):
         ]
 
     def get_image_url(self, obj):
-        return abs_url(obj, 'image', self.context)
+            request = self.context.get("request")
+    
+            if not obj.image:
+                return None
+    
+            try:
+                # if it's ImageField
+                if hasattr(obj.image, "url"):
+                    return request.build_absolute_uri(obj.image.url)
+                # if it's already URLField
+                return request.build_absolute_uri("/media/" + str(obj.image))
+            except Exception:
+                return None
+    def get_category_slug(self, obj):
+        try:
+            return obj.category.slug if obj.category else None
+        except Exception:
+            return None
+
+    def get_subcategory_slug(self, obj):
+        try:
+            return obj.subcategory.slug if obj.subcategory else None
+        except Exception:
+            return None
     

@@ -123,8 +123,8 @@ export default function ProductDetail() {
   // Build exactly 4 image slots from product.images array (each has image_url)
   // Fall back to primary_image string if images array is empty / absent.
   const rawImages = product.images?.length
-    ? product.images.map(img => img.image_url).filter(Boolean)
-    : [product.primary_image].filter(Boolean)
+    ? product.images.map(img => img?.image_url).filter(Boolean)
+    : [product.primary_image?.image_url].filter(Boolean)
 
   // We show up to 4 thumbnails; if fewer images exist we just show what we have
   const images = rawImages.slice(0, 4)
@@ -609,7 +609,7 @@ export default function ProductDetail() {
                 >
                   <div className={styles.relatedImgWrap}>
                     <img
-                      src={rel.primary_image || '/images/capsicumdefault.png'}
+                      src={rel.primary_image?.image_url || '/images/capsicumdefault.png'}
                       alt={rel.name}
                       loading="lazy"
                     />

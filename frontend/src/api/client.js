@@ -4,7 +4,7 @@
  */
 import axios from 'axios'
 
-export const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+export const BASE_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'
 
 const client = axios.create({
   baseURL: `${BASE_URL}/api`,
@@ -31,10 +31,15 @@ client.interceptors.response.use(
   r => r,
   async (error) => {
     const orig = error.config
+     if (orig.skipAuthRefresh) {
+      return Promise.reject(error)
+    }
     if (error.response?.status === 401 && !orig._retry) {
       if (refreshing) {
         return new Promise((resolve, reject) => waitQueue.push({ resolve, reject }))
-          .then(token => { orig.headers.Authorization = `Bearer ${token}`; return client(orig) })
+          .then(token => { orig.headers = orig.headers || {}
+          orig.headers.Authorization = `Bearer ${token}`;
+          return client(orig) })
       }
       orig._retry = true
       refreshing  = true
@@ -45,15 +50,19 @@ client.interceptors.response.use(
         return Promise.reject(error)
       }
       try {
-        const { data } = await axios.post(`${BASE_URL}/api/auth/token/refresh/`, { refresh })
+         const { data } = await axios.post(
+          `${BASE_URL}/auth/token/refresh/`, // ✅ FIXED
+          { refresh },
+          { skipAuthRefresh: true }          // ✅ PREVENT LOOP
+        )
         localStorage.setItem('fm_access', data.access)
         drain(null, data.access)
+        orig.headers = orig.headers || {}
         orig.headers.Authorization = `Bearer ${data.access}`
         return client(orig)
       } catch (e) {
         drain(e, null)
-        localStorage.removeItem('fm_access')
-        localStorage.removeItem('fm_refresh')
+        localStorage.clear()
         window.dispatchEvent(new Event('fm:logout'))
         return Promise.reject(e)
       } finally {

@@ -59,16 +59,16 @@ class SubCategoryAdmin(admin.ModelAdmin):
 # ─────────────────────────────────────────────────────────────────────────────
 # Product admin
 # ─────────────────────────────────────────────────────────────────────────────
-
+    
 class ProductImageInline(admin.TabularInline):
-    model           = ProductImage
+    model           = ProductImage 
     extra           = 1
     fields          = ['image', 'alt_text', 'is_primary', 'is_hover', 'order', 'preview']
     readonly_fields = ['preview']
     ordering        = ['order']
 
     def preview(self, obj):
-        if obj.pk and obj.image:
+        if obj.pk and obj.image_url:
             return format_html(
                 '<img src="{}" height="60" style="border-radius:4px"/>',
                 obj.image.url
@@ -180,8 +180,8 @@ class ProductAdmin(admin.ModelAdmin):
         img = obj.primary_image
         if img and img.image:
             return format_html(
-                '<img src="{}" height="50" style="border-radius:4px"/>',
-                img.image.url
+                '<a href="{}" target="_blank"><img src="{}" height="50"/></a>',
+                img.image.url, img.image.url
             )
         return '—'
     product_image.short_description = 'Image'

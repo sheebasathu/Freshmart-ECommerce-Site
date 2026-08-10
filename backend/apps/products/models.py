@@ -44,7 +44,7 @@ class SubCategory(models.Model):
     name        = models.CharField(max_length=100)
     slug        = models.SlugField(blank=True)
     icon        = models.CharField(max_length=10, blank=True, help_text='Emoji icon e.g. 🥦')
-    image       = models.ImageField(upload_to='subcategories/', null=True, blank=True)
+    image = models.ImageField(upload_to='subcategories/', null=True, blank=True)
     description = models.TextField(blank=True)
     is_active   = models.BooleanField(default=True)
     order       = models.PositiveIntegerField(default=0)
@@ -57,7 +57,7 @@ class SubCategory(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = slugify(self.name)
+            self.slug = slugify(self.name)        
         super().save(*args, **kwargs)
 
     def __str__(self):
@@ -177,7 +177,8 @@ class ProductImage(models.Model):
     order       — controls display sequence in the image gallery.
     """
     product    = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images')
-    image      = models.ImageField(upload_to='products/')
+    image = models.ImageField(upload_to='products/', blank=True, null=True)
+    image_url = models.URLField(blank=True, null=True)
     alt_text   = models.CharField(max_length=200, blank=True)
     is_primary = models.BooleanField(
         default=False,
@@ -207,14 +208,17 @@ class ProductImage(models.Model):
 
     def save(self, *args, **kwargs):
         # Ensure at most one primary and one hover image per product
+            
         if self.is_primary:
             ProductImage.objects.filter(
                 product=self.product, is_primary=True
             ).exclude(pk=self.pk).update(is_primary=False)
+            
         if self.is_hover:
             ProductImage.objects.filter(
                 product=self.product, is_hover=True
             ).exclude(pk=self.pk).update(is_hover=False)
+            
         super().save(*args, **kwargs)
 
     def __str__(self):

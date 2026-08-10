@@ -12,13 +12,6 @@ from .models import (
 # Helpers
 # ─────────────────────────────────────────────────────────────────────────────
 
-def build_url(obj, field, context):
-    """Return absolute URL for an ImageField value, or None."""
-    req = context.get('request')
-    val = getattr(obj, field, None)
-    return req.build_absolute_uri(val.url) if (val and req) else None
-
-
 # ─────────────────────────────────────────────────────────────────────────────
 # Taxonomy serializers
 # ─────────────────────────────────────────────────────────────────────────────
@@ -31,8 +24,23 @@ class SubCategorySerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'slug', 'icon', 'image_url', 'description']
 
     def get_image_url(self, obj):
-        return build_url(obj, 'image', self.context)
-
+            request = self.context.get("request")
+    
+            if not obj.image:
+                return None
+    
+            try:
+                # If it's ImageField
+                if hasattr(obj.image, "url"):
+                    return request.build_absolute_uri(obj.image.url)
+    
+                # If it's string (like "banners/file.png")
+                return request.build_absolute_uri("/media/" + str(obj.image))
+    
+            except Exception:
+                return None
+    
+        
 
 class CategorySerializer(serializers.ModelSerializer):
     image_url     = serializers.SerializerMethodField()
@@ -47,7 +55,21 @@ class CategorySerializer(serializers.ModelSerializer):
         ]
 
     def get_image_url(self, obj):
-        return build_url(obj, 'image', self.context)
+        request = self.context.get("request")
+
+        if not obj.image:
+            return None
+
+        try:
+            # If it's ImageField
+            if hasattr(obj.image, "url"):
+                return request.build_absolute_uri(obj.image.url)
+
+            # If it's string (like "banners/file.png")
+            return request.build_absolute_uri("/media/" + str(obj.image))
+
+        except Exception:
+            return None
 
     def get_product_count(self, obj):
         return getattr(obj, 'product_count', 0)
@@ -78,7 +100,21 @@ class ProductImageSerializer(serializers.ModelSerializer):
         fields = ['id', 'image_url', 'alt_text', 'is_primary', 'is_hover', 'order']
 
     def get_image_url(self, obj):
-        return build_url(obj, 'image', self.context)
+            request = self.context.get("request")
+    
+            if not obj.image:
+                return None
+    
+            try:
+                # If it's ImageField
+                if hasattr(obj.image, "url"):
+                    return request.build_absolute_uri(obj.image.url)
+    
+                # If it's string (like "banners/file.png")
+                return request.build_absolute_uri("/media/" + str(obj.image))
+    
+            except Exception:
+                return None
 
 
 class ProductVariantSerializer(serializers.ModelSerializer):
@@ -140,21 +176,15 @@ class ProductListSerializer(serializers.ModelSerializer):
         ]
 
     def get_primary_image(self, obj):
-        req = self.context.get('request')
         img = obj.primary_image
-        if img and img.image and req:
-            return req.build_absolute_uri(img.image.url)
-        return None
+        return img.image.url if img and img.image else None
 
     def get_hover_image(self, obj):
-        req = self.context.get('request')
         img = obj.hover_image
-        if img and img.image and req:
-            return req.build_absolute_uri(img.image.url)
-        return None
+        return img.image.url if img and img.image else None
     
     def get_variants(self, obj):
-        qs = obj.variants.all()
+        qs = obj.variants.filter(is_active=True)[:2]
         return ProductVariantSerializer(qs, many=True, context=self.context).data
 
 
@@ -184,10 +214,12 @@ class RelatedProductSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'slug', 'primary_image', 'variants']
 
     def get_primary_image(self, obj):
-        req = self.context.get('request')
         img = obj.primary_image
-        return req.build_absolute_uri(img.image.url) if (img and img.image and req) else None
-
+        return img.image.url if img and img.image else None
+    
+    def get_variants(self, obj):
+        qs = obj.variants.filter(is_active=True)[:1]
+        return ProductVariantSerializer(qs, many=True).data
 # ─────────────────────────────────────────────────────────────────────────────
 # Product detail serializer (used on product detail page)
 # ─────────────────────────────────────────────────────────────────────────────
@@ -200,7 +232,7 @@ class ProductDetailSerializer(serializers.ModelSerializer):
     category             = serializers.SerializerMethodField()
     subcategory          = serializers.SerializerMethodField()
     images               = ProductImageSerializer(many=True, read_only=True)
-    variants             = ProductVariantSerializer(many=True, read_only=True)
+    variants             = serializers.SerializerMethodField()
     primary_image        = serializers.SerializerMethodField()
     
      # Section 2 — about
@@ -210,8 +242,8 @@ class ProductDetailSerializer(serializers.ModelSerializer):
     specifications       = ProductSpecificationSerializer(many=True, read_only=True)
 
    # Reviews summary
-    avg_rating           = serializers.SerializerMethodField()
-    review_count         = serializers.SerializerMethodField()
+    avg_rating = serializers.SerializerMethodField()
+    review_count = serializers.SerializerMethodField()
     rating_distribution  = serializers.SerializerMethodField()
 
     # Section 5 — related
@@ -232,13 +264,13 @@ class ProductDetailSerializer(serializers.ModelSerializer):
             'is_featured', 'created_at',
         ]
     
-    def _abs(self, img):
-        req = self.context.get('request')
-        return req.build_absolute_uri(img.url) if (img and req) else None
-
     def get_primary_image(self, obj):
         img = obj.primary_image
-        return self._abs(img.image) if (img and img.image) else None
+        return img.image.url if img and img.image else None
+    
+    def get_variants(self, obj):
+            qs = obj.variants.filter(is_active=True)
+            return ProductVariantSerializer(qs, many=True, context=self.context).data
 
     def get_category(self, obj):
         if not obj.category:
@@ -269,7 +301,8 @@ class ProductDetailSerializer(serializers.ModelSerializer):
         counts = qs.values('rating').annotate(n=Count('id'))
         dist   = {r: 0 for r in range(1, 6)}
         for row in counts:
-            dist[row['rating']] = round(row['n'] / total * 100)
+            if row['rating'] in dist:
+                dist[row['rating']] = round(row['n'] / total * 100)
         return dist
 
     def get_related_products(self, obj):
@@ -282,5 +315,6 @@ class ProductDetailSerializer(serializers.ModelSerializer):
             qs = qs.filter(subcategory=obj.subcategory)
         elif obj.category:
             qs = qs.filter(category=obj.category)
-        qs = qs.prefetch_related('images', 'variants').order_by('order', '-created_at')[:3]
+        qs = qs.select_related('category', 'subcategory').prefetch_related('images', 'variants').order_by('order', '-created_at')[:3]
         return RelatedProductSerializer(qs, many=True, context=self.context).data
+    

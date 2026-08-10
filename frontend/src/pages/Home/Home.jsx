@@ -1,7 +1,7 @@
 // src/pages/Home/Home.jsx
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import ProductCard         from '../../components/ProductCard/ProductCard'
+import ProductCard from '../../components/ProductCard/ProductCard'
 import SpecialCategoryCard from '../../components/Specialcategorycard/Specialcategorycard'
 import {
   getHomepageContent,
@@ -13,49 +13,64 @@ import styles from './Home.module.css'
 export default function Home() {
   const navigate = useNavigate()
 
-  const [cms,         setCms]         = useState(null)
+  const [cms, setCms] = useState(null)
   const [smartBasket, setSmartBasket] = useState([])
   const [bestSelling, setBestSelling] = useState([])
-  const [loading,     setLoading]     = useState(true)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    Promise.all([
-      getHomepageContent(),
-      getFeaturedProducts(),
-      getBestSellingProducts(),
-    ])
-      .then(([cmsData, featured, best]) => {
+    let isMounted = true
+
+    const fetchData = async () => {
+      try {
+        const [cmsData, featured, best] = await Promise.all([
+          getHomepageContent(),
+          getFeaturedProducts(),
+          getBestSellingProducts(),
+        ])
+
+        if (!isMounted) return
+
         setCms(cmsData)
         setSmartBasket(Array.isArray(featured) ? featured.slice(0, 4) : [])
-        setBestSelling(Array.isArray(best)     ? best.slice(0, 4)     : [])
-      })
-      .catch(console.error)
-      .finally(() => setLoading(false))
+        setBestSelling(Array.isArray(best) ? best.slice(0, 4) : [])
+      } catch (err) {
+        console.error("HOME API ERROR:", err)
+      } finally {
+        if (isMounted) setLoading(false)
+      }
+    }
+
+    fetchData()
+
+    return () => {
+      isMounted = false
+    }
   }, [])
 
   if (loading) return (
-    <div style={{ display:'flex', justifyContent:'center', alignItems:'center', height:'60vh' }}>
+    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '60vh' }}>
       <div style={{
-        width:40, height:40,
-        border:'4px solid #e5e7eb', borderTopColor:'#21B421',
-        borderRadius:'50%', animation:'spin 0.8s linear infinite',
-      }}/>
+        width: 40, height: 40,
+        border: '4px solid #e5e7eb', borderTopColor: '#21B421',
+        borderRadius: '50%', animation: 'spin 0.8s linear infinite',
+      }} />
       <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
     </div>
   )
 
-  const heroBanners  = cms?.hero_banners      || []
-  const promoBanners = cms?.promo_banners     || []
-  const topOffers    = cms?.top_offer_banners || []
+  const heroBanners = cms?.hero_banners || []
+  const promoBanners = cms?.promo_banners || []
+  const topOffers = cms?.top_offer_banners || []
   const featuredSecs = cms?.featured_sections || []
-  const shopCats     = cms?.shop_categories   || []
-  const popularPills = cms?.popular_pills     || []
-  const fruitsVegs   = cms?.fruits_vegetables || []
-  const dailyDeals   = cms?.daily_deals       || []
+  const shopCats = cms?.shop_categories || []
+  const popularPills = cms?.popular_pills || []
+  const fruitsVegs = cms?.fruits_vegetables || []
+  const dailyDeals = cms?.daily_deals || []
 
   // Build listing URL: prefer subcategory → category → fallback
   const cardUrl = (card, fallback = '/listing') => {
-    console.log("CARD DATA:", card) 
+    console.log("CARD DATA:", card)
     if (card.subcategory_slug)
       return `/listing?subcategory=${card.subcategory_slug}`
     if (card.category_slug)
@@ -80,7 +95,7 @@ export default function Home() {
             <>
               <h1 className={styles.heroTitle}>
                 {(() => {
-                  const title     = heroBanners[0]?.title || ''
+                  const title = heroBanners[0]?.title || ''
                   const highlight = heroBanners[0]?.highlight_title
                   if (!highlight || !title.includes(highlight)) return title
                   const [before, after] = title.split(highlight)
@@ -141,7 +156,7 @@ export default function Home() {
             {featuredSecs.map(f => (
               <div key={f.id} className={styles.featCard}
                 onClick={() => navigate(cardUrl(f, '/listing?is_featured=true'))}>
-                <img src={f.image_url} alt={f.title} loading="lazy"/>
+                <img src={f.image_url} alt={f.title} loading="lazy" />
                 <div className={styles.featBody}>
                   <h3>{f.title}</h3>
                   {f.subtitle && <p>{f.subtitle}</p>}
@@ -161,7 +176,7 @@ export default function Home() {
               onClick={() => navigate('/listing?is_featured=true')}>View All</button>
           </div>
           <div className={styles.prodGrid}>
-            {smartBasket.map(p => <ProductCard key={p.id} product={p}/>)}
+            {smartBasket.map(p => <ProductCard key={p.id} product={p} />)}
           </div>
         </section>
       )}
@@ -175,7 +190,7 @@ export default function Home() {
               onClick={() => navigate('/listing?is_best_selling=true')}>View All</button>
           </div>
           <div className={styles.prodGrid}>
-            {bestSelling.map(p => <ProductCard key={p.id} product={p}/>)}
+            {bestSelling.map(p => <ProductCard key={p.id} product={p} />)}
           </div>
         </section>
       )}
@@ -215,7 +230,10 @@ export default function Home() {
               <div key={c.id} className={styles.sbcCard}
                 onClick={() => navigate(`/listing?category=${c.category_slug}`)}>
                 <div className={styles.sbcImg}>
-                  <img src={c.image_url} alt={c.category_name} loading="lazy"/>
+                  <img src={c?.image_url} alt={c?.category_name} loading="lazy"
+                    onError={(e) => {
+                      e.target.src = '/images/default-category.png'
+                    }} />
                 </div>
                 <p className={styles.sbcName}>{c.category_name}</p>
               </div>
@@ -259,7 +277,7 @@ export default function Home() {
               <div key={o.id} className={styles.offerCard}
                 onClick={() => navigate(o.cta_link || '/listing')}>
                 <div className={styles.offerImgWrap}>
-                  <img src={o.image_url} alt={o.title} loading="lazy"/>
+                  <img src={o.image_url} alt={o.title} loading="lazy" />
                 </div>
                 <div className={styles.offerText}>
                   <div className={styles.offerTitle}>{o.title}</div>
@@ -276,7 +294,7 @@ export default function Home() {
         <section className={`${styles.dpoBanner} wrap`}>
           <div className={styles.dpoInner}>
             <div className={styles.dpoImg}>
-              <img src={promoBanners[0].image_url} alt={promoBanners[0].title} loading="lazy"/>
+              <img src={promoBanners[0].image_url} alt={promoBanners[0].title} loading="lazy" />
             </div>
             <div className={styles.dpoContent}>
               <h2 className={styles.dpoHeading}>{promoBanners[0].title}</h2>
