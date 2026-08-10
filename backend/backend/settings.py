@@ -105,10 +105,10 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 
 
 DATABASES = {
-    'default': dj_database_url.config(
-        default=config('DATABASE_URL'),
+    'default': dj_database_url.parse(
+        config('DATABASE_URL'),
         conn_max_age=600,
-        ssl_require=not DEBUG
+        ssl_require=True
     )
 }
 AUTH_USER_MODEL = 'accounts.User'
