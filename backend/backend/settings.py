@@ -105,7 +105,7 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 
 DATABASES = {
     'default': dj_database_url.config(
-        default=config('DATABASE_URL'),
+        default=config('postgresql://freshmart_geu9_user:BBU1VGsQ1B2a0yRTMWglhCXxUaYMThFC@dpg-d9srhv710e5c73afigj0-a.singapore-postgres.render.com/freshmart_geu9'),
         conn_max_age=600,
         ssl_require=not DEBUG
     )
