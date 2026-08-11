@@ -10,7 +10,18 @@ from .models import (
 def build_url(request, url):
     if not url:
         return None
-    return request.build_absolute_uri(url) if request else url
+    url = str(url)
+    
+     # Already an absolute URL.
+    # IMPORTANT for Cloudinary.
+    if url.startswith("http://") or url.startswith("https://"):
+        return url
+    
+     # Relative URL/path.
+    if request:
+        return request.build_absolute_uri(url)
+
+    return url
 # ─────────────────────────────────────────────────────────────────────────────
 # Banner
 # ─────────────────────────────────────────────────────────────────────────────
@@ -28,17 +39,18 @@ class BannerSerializer(serializers.ModelSerializer):
     def get_image_url(self, obj):
         request = self.context.get("request")
 
-        if not obj.image:
-            return None
-
         try:
-            # if it's ImageField
-            if hasattr(obj.image, "url"):
-                return request.build_absolute_uri(obj.image.url)
+            if obj.image:
+                if hasattr(obj.image, "url"):
+                    return build_url(request, obj.image.url)
             # if it's already URLField
-            return request.build_absolute_uri("/media/" + str(obj.image))
+                return build_url(request, obj.image)
+            if obj.image_file:
+                return build_url(request, obj.image_file.url)
         except Exception:
-            return None
+            pass
+        
+        return None
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Featured section
@@ -62,17 +74,19 @@ class FeaturedSectionSerializer(serializers.ModelSerializer):
     def get_image_url(self, obj):
             request = self.context.get("request")
     
-            if not obj.image:
-                return None
-    
             try:
-                # if it's ImageField
-                if hasattr(obj.image, "url"):
-                    return request.build_absolute_uri(obj.image.url)
+                if obj.image:
+                    if hasattr(obj.image, "url"):
+                        return build_url(request, obj.image.url)
                 # if it's already URLField
-                return request.build_absolute_uri("/media/" + str(obj.image))
+                    return build_url(request, obj.image)
+                
+                if obj.image_file:
+                    return build_url(request, obj.image_file.url)
+
             except Exception:
-                return None
+                pass
+            return None
     def get_category_slug(self, obj):
         return obj.category.slug if obj.category else None
 
@@ -145,17 +159,20 @@ class ShopCategorySerializer(serializers.ModelSerializer):
     def get_image_url(self, obj):
             request = self.context.get("request")
     
-            if not obj.image:
-                return None
-    
             try:
-                # if it's ImageField
-                if hasattr(obj.image, "url"):
-                    return request.build_absolute_uri(obj.image.url)
-                # if it's already URLField
-                return request.build_absolute_uri("/media/" + str(obj.image))
+                if obj.image:
+                    if hasattr(obj.image, "url"):
+                        return build_url(request, obj.image.url)
+
+                    return build_url(request, obj.image)
+
+                if obj.image_file:
+                    return build_url(request, obj.image_file.url)
+
             except Exception:
-                return None
+                pass
+
+            return None
     def get_category_name(self, obj):
         return obj.category.name if obj.category else None
 
@@ -212,17 +229,18 @@ class FruitsVegetableCardSerializer(serializers.ModelSerializer):
     def get_image_url(self, obj):
             request = self.context.get("request")
     
-            if not obj.image:
-                return None
-    
             try:
-                # if it's ImageField
-                if hasattr(obj.image, "url"):
-                    return request.build_absolute_uri(obj.image.url)
+                if obj.image:
+                    if hasattr(obj.image, "url"):
+                        return build_url(request, obj.image.url)
                 # if it's already URLField
-                return request.build_absolute_uri("/media/" + str(obj.image))
+                    return build_url(request, obj.image)
+                if obj.image_file:
+                    return build_url(request, obj.image_file.url)
             except Exception:
-                return None
+                 pass
+             
+            return None
     def get_category_slug(self, obj):
         try:
             return obj.category.slug if obj.category else None
@@ -250,17 +268,18 @@ class DailyDealCardSerializer(serializers.ModelSerializer):
     def get_image_url(self, obj):
             request = self.context.get("request")
     
-            if not obj.image:
-                return None
-    
             try:
-                # if it's ImageField
-                if hasattr(obj.image, "url"):
-                    return request.build_absolute_uri(obj.image.url)
+                if obj.image:
+                    if hasattr(obj.image, "url"):
+                        return build_url(request, obj.image.url)
                 # if it's already URLField
-                return request.build_absolute_uri("/media/" + str(obj.image))
+                    return build_url(request, obj.image)
+                if obj.image_file:
+                    return build_url(request, obj.image_file.url)
             except Exception:
-                return None
+                pass
+                         
+            return None
     def get_category_slug(self, obj):
         try:
             return obj.category.slug if obj.category else None
