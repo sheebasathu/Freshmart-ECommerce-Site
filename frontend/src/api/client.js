@@ -4,7 +4,7 @@
  */
 import axios from 'axios'
 
-export const BASE_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'
+export const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000'
 
 const client = axios.create({
   baseURL: `${BASE_URL}/api`,
@@ -51,7 +51,7 @@ client.interceptors.response.use(
       }
       try {
          const { data } = await axios.post(
-          `${BASE_URL}/auth/token/refresh/`, // ✅ FIXED
+          `${BASE_URL}/api/auth/token/refresh/`, // ✅ FIXED
           { refresh },
           { skipAuthRefresh: true }          // ✅ PREVENT LOOP
         )
