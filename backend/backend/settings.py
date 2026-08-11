@@ -174,11 +174,13 @@ CLOUDINARY_STORAGE = {
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 CSRF_TRUSTED_ORIGINS = [
-    "https://your-frontend.vercel.app",
+    "http://localhost:5173",
+    "https://freshmart-e-commerce-site.vercel.app",
 ]
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOWED_ORIGINS = [
-    "https://your-frontend.vercel.app"
+    "http://localhost:5173",
+    "https://freshmart-e-commerce-site.vercel.app"
 ] 
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
