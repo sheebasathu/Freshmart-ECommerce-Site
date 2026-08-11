@@ -39,15 +39,13 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'email', 'phone', 'avatar_url', 'date_joined']
 
     def get_avatar_url(self, obj):
-        request = self.context.get('request')
-        if obj.avatar:
-            if request:
-                return request.build_absolute_uri(obj.avatar.url)
-            # Fallback when no request in context (e.g. JWT serializer path)
-            from django.conf import settings
-            base = getattr(settings, 'MEDIA_URL', '/media/')
-            return f'http://localhost:8000{base}{obj.avatar.name}'
-        return None
+        if not obj.avatar:
+            return None
+
+        try:
+            return obj.avatar.url
+        except Exception:
+            return None
 
 
 class UpdateProfileSerializer(serializers.ModelSerializer):
