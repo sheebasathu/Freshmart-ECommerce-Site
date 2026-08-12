@@ -92,7 +92,7 @@ class NavCategoryChildInline(admin.TabularInline):
     model           = NavCategory
     fk_name         = 'parent'
     extra           = 1
-    fields          = ['name', 'icon_file', 'icon', 'icon_emoji', 'description', 'category', 'custom_path', 'is_active', 'order']
+    fields          = ['name', 'icon', 'icon_emoji', 'description', 'category', 'custom_path', 'is_active', 'order']
     readonly_fields = ['icon']
     show_change_link = True
     verbose_name        = 'Sub-category'
@@ -115,7 +115,7 @@ class NavCategoryAdmin(admin.ModelAdmin):
  
     fieldsets = (
         ('Display', {
-            'fields': ('name', 'icon_file', 'icon', 'icon_emoji', 'description'),
+            'fields': ('name', 'icon', 'icon_emoji', 'description'),
         }),
         ('Link', {
             'fields': ('category', 'custom_path'),
