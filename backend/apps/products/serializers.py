@@ -100,24 +100,37 @@ class ProductImageSerializer(serializers.ModelSerializer):
         fields = ['id', 'image_url', 'alt_text', 'is_primary', 'is_hover', 'order']
 
     def get_image_url(self, obj):
-            request = self.context.get("request")
+        request = self.context.get("request")
     
-            if not obj.image:
-                return None
-    
+        # Prefer externally stored URL, e.g. Cloudinary
+        if obj.image_url:
+            url = str(obj.image_url)
+
+            if url.startswith('http://') or url.startswith('https://'):
+                return url
+
+            if request:
+                return request.build_absolute_uri(url)
+
+            return url
+        
+        # Fallback to Django ImageField
+        if obj.image:
             try:
-                image_url = obj.image.url
-                # If it's ImageField
-                if image_url.startswith(('http://', 'https://')):
-                    return image_url
-    
+                url = obj.image.url
+
+                if url.startswith('http://') or url.startswith('https://'):
+                    return url
+
                 if request:
-                    return request.build_absolute_uri(image_url)
-                return image_url
-    
+                    return request.build_absolute_uri(url)
+
+                return url
+
             except Exception:
                 return None
 
+        return None
 
 class ProductVariantSerializer(serializers.ModelSerializer):
     discount = serializers.CharField(source='discount_pct', read_only=True)
@@ -178,12 +191,67 @@ class ProductListSerializer(serializers.ModelSerializer):
         ]
 
     def get_primary_image(self, obj):
+        request = self.context.get('request')
         img = obj.primary_image
-        return img.image.url if img and img.image else None
+        
+        if not img:
+            return None
+        
+        if img.image_url:
+            url = str(img.image_url)
+            
+            if url.startswith('http://') or url.startswith('https://'):
+                return url
+        
+            if request:
+                return request.build_absolute_uri(url)
+
+            return url
+        
+        if img.image:
+            try:
+                url = img.image.url
+                 
+                if url.startswith('http://') or url.startswith('https://'):
+                    return url
+                if request:
+                    return request.build_absolute_uri(url)
+                return url
+            except Exception:
+                return None
+        return None
 
     def get_hover_image(self, obj):
+        request = self.context.get('request')
         img = obj.hover_image
-        return img.image.url if img and img.image else None
+        
+        if not img:
+            return None
+                
+        if img.image_url:
+            url = str(img.image_url)
+            
+            if url.startswith('http://') or url.startswith('https://'):
+                return url
+        
+            if request:
+                return request.build_absolute_uri(url)
+
+            return url
+                
+        if img.image:
+            try:
+                url = img.image.url
+                    
+                if url.startswith('http://') or url.startswith('https://'):
+                    return url
+                if request:
+                    return request.build_absolute_uri(url)
+                return url
+            except Exception:
+                return None
+        return None
+        
     
     def get_variants(self, obj):
         qs = obj.variants.filter(is_active=True)[:2]
@@ -209,7 +277,7 @@ class RelatedProductSerializer(serializers.ModelSerializer):
       name, primary_image URL, first variant price + weight.
     """
     primary_image = serializers.SerializerMethodField()
-    variants      = ProductVariantSerializer(many=True, read_only=True)
+    variants      = serializers.SerializerMethodField()
 
     class Meta:
         model  = Product
@@ -220,22 +288,38 @@ class RelatedProductSerializer(serializers.ModelSerializer):
         img = obj.primary_image
         if not img:
             return None
-        try:
-            if img.image:
-                image_url = img.image.url
-            # Cloudinary already returns an absolute URL.
-                if image_url.startswith('http://') or image_url.startswith('https://'):
-                    return image_url
-                # Fallback for relative URLs.
-                if request:
-                    return request.build_absolute_uri(image_url)
-                return image_url
         
-            if img.image_url:
-                return img.image_url
+        # ─────────────────────────────────────────────────────────────
+        # 1. Prefer image_url if it is populated.
+        #    This handles Cloudinary/external image URLs.
+        # ─────────────────────────────────────────────────────────────
+        
+        if img.image_url:
+            url = str(img.image_url)
             
-        except Exception:
-            return None
+            if url.startswith('http://') or url.startswith('https://'):
+                return url
+
+            if request:
+                return request.build_absolute_uri(url)
+            
+            return url
+        # ─────────────────────────────────────────────────────────────
+        # 2. Otherwise use the ImageField.
+        # ─────────────────────────────────────────────────────────────
+        if img.image:
+            try:
+                url = img.image.url
+                
+                if url.startswith('http://') or url.startswith('https://'):
+                    return url
+                if request:
+                    return request.build_absolute_uri(url)
+                return url
+            
+            except Exception:
+                return None
+        return None
     def get_variants(self, obj):
         qs = obj.variants.filter(is_active=True).order_by('id')[:1]
         return ProductVariantSerializer(qs, many=True, context=self.context).data
