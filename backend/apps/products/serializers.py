@@ -106,12 +106,14 @@ class ProductImageSerializer(serializers.ModelSerializer):
                 return None
     
             try:
+                image_url = obj.image.url
                 # If it's ImageField
-                if hasattr(obj.image, "url"):
-                    return request.build_absolute_uri(obj.image.url)
+                if image_url.startswith(('http://', 'https://')):
+                    return image_url
     
-                # If it's string (like "banners/file.png")
-                return request.build_absolute_uri("/media/" + str(obj.image))
+                if request:
+                    return request.build_absolute_uri(image_url)
+                return image_url
     
             except Exception:
                 return None
@@ -214,12 +216,29 @@ class RelatedProductSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'slug', 'primary_image', 'variants']
 
     def get_primary_image(self, obj):
+        request = self.context.get('request')
         img = obj.primary_image
-        return img.image.url if img and img.image else None
-    
+        if not img:
+            return None
+        try:
+            if img.image:
+                image_url = img.image.url
+            # Cloudinary already returns an absolute URL.
+                if image_url.startswith('http://') or image_url.startswith('https://'):
+                    return image_url
+                # Fallback for relative URLs.
+                if request:
+                    return request.build_absolute_uri(image_url)
+                return image_url
+        
+            if img.image_url:
+                return img.image_url
+            
+        except Exception:
+            return None
     def get_variants(self, obj):
-        qs = obj.variants.filter(is_active=True)[:1]
-        return ProductVariantSerializer(qs, many=True).data
+        qs = obj.variants.filter(is_active=True).order_by('id')[:1]
+        return ProductVariantSerializer(qs, many=True, context=self.context).data
 # ─────────────────────────────────────────────────────────────────────────────
 # Product detail serializer (used on product detail page)
 # ─────────────────────────────────────────────────────────────────────────────

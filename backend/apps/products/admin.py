@@ -26,7 +26,7 @@ class CategoryAdmin(admin.ModelAdmin):
     inlines             = [SubCategoryInline]
 
     def preview(self, obj):
-        if obj.image:
+        if obj.pk and obj.image:
             return format_html('<img src="{}" height="40"/>', obj.image.url)
         return '—'
     preview.short_description = 'Image'
@@ -50,7 +50,7 @@ class SubCategoryAdmin(admin.ModelAdmin):
     autocomplete_fields = ['category']
 
     def preview(self, obj):
-        if obj.image:
+        if obj.pk and obj.image:
             return format_html('<img src="{}" height="40"/>', obj.image.url)
         return '—'
     preview.short_description = 'Image'
@@ -68,7 +68,7 @@ class ProductImageInline(admin.TabularInline):
     ordering        = ['order']
 
     def preview(self, obj):
-        if obj.pk and obj.image_url:
+        if obj.pk and obj.image:
             return format_html(
                 '<img src="{}" height="60" style="border-radius:4px"/>',
                 obj.image.url
@@ -185,9 +185,6 @@ class ProductAdmin(admin.ModelAdmin):
             )
         return '—'
     product_image.short_description = 'Image'
-
-    def save_model(self, request, obj, form, change):
-        super().save_model(request, obj, form, change)
 
 # ── Standalone admin classes ──────────────────────────────────────────────────
 
