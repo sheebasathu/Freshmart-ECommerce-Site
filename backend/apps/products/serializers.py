@@ -15,6 +15,50 @@ from .models import (
 # ─────────────────────────────────────────────────────────────────────────────
 # Taxonomy serializers
 # ─────────────────────────────────────────────────────────────────────────────
+def get_product_image_url(image_obj, request=None):
+    """
+    Return the correct usable URL for a ProductImage.
+
+    Priority:
+    1. image_url
+    2. uploaded ImageField
+    """
+
+    if not image_obj:
+        return None
+
+    # 1. Use image_url when available
+    if image_obj.image_url:
+        url = str(image_obj.image_url).strip()
+
+        if not url:
+            return None
+
+        if url.startswith(('http://', 'https://')):
+            return url
+
+        if request:
+            return request.build_absolute_uri(url)
+
+        return url
+
+    # 2. Fall back to ImageField
+    if image_obj.image:
+        try:
+            url = image_obj.image.url
+
+            if url.startswith(('http://', 'https://')):
+                return url
+
+            if request:
+                return request.build_absolute_uri(url)
+
+            return url
+
+        except Exception:
+            return None
+
+    return None
 
 class SubCategorySerializer(serializers.ModelSerializer):
     image_url = serializers.SerializerMethodField()
@@ -101,36 +145,8 @@ class ProductImageSerializer(serializers.ModelSerializer):
 
     def get_image_url(self, obj):
         request = self.context.get("request")
-    
-        # Prefer externally stored URL, e.g. Cloudinary
-        if obj.image_url:
-            url = str(obj.image_url)
-
-            if url.startswith('http://') or url.startswith('https://'):
-                return url
-
-            if request:
-                return request.build_absolute_uri(url)
-
-            return url
+        return get_product_image_url(obj, request)
         
-        # Fallback to Django ImageField
-        if obj.image:
-            try:
-                url = obj.image.url
-
-                if url.startswith('http://') or url.startswith('https://'):
-                    return url
-
-                if request:
-                    return request.build_absolute_uri(url)
-
-                return url
-
-            except Exception:
-                return None
-
-        return None
 
 class ProductVariantSerializer(serializers.ModelSerializer):
     discount = serializers.CharField(source='discount_pct', read_only=True)
@@ -192,66 +208,11 @@ class ProductListSerializer(serializers.ModelSerializer):
 
     def get_primary_image(self, obj):
         request = self.context.get('request')
-        img = obj.primary_image
-        
-        if not img:
-            return None
-        
-        if img.image_url:
-            url = str(img.image_url)
-            
-            if url.startswith('http://') or url.startswith('https://'):
-                return url
-        
-            if request:
-                return request.build_absolute_uri(url)
-
-            return url
-        
-        if img.image:
-            try:
-                url = img.image.url
-                 
-                if url.startswith('http://') or url.startswith('https://'):
-                    return url
-                if request:
-                    return request.build_absolute_uri(url)
-                return url
-            except Exception:
-                return None
-        return None
-
+        return get_product_image_url(obj.primary_image, request)
+    
     def get_hover_image(self, obj):
         request = self.context.get('request')
-        img = obj.hover_image
-        
-        if not img:
-            return None
-                
-        if img.image_url:
-            url = str(img.image_url)
-            
-            if url.startswith('http://') or url.startswith('https://'):
-                return url
-        
-            if request:
-                return request.build_absolute_uri(url)
-
-            return url
-                
-        if img.image:
-            try:
-                url = img.image.url
-                    
-                if url.startswith('http://') or url.startswith('https://'):
-                    return url
-                if request:
-                    return request.build_absolute_uri(url)
-                return url
-            except Exception:
-                return None
-        return None
-        
+        return get_product_image_url(obj.hover_image, request)
     
     def get_variants(self, obj):
         qs = obj.variants.filter(is_active=True)[:2]
@@ -285,41 +246,8 @@ class RelatedProductSerializer(serializers.ModelSerializer):
 
     def get_primary_image(self, obj):
         request = self.context.get('request')
-        img = obj.primary_image
-        if not img:
-            return None
-        
-        # ─────────────────────────────────────────────────────────────
-        # 1. Prefer image_url if it is populated.
-        #    This handles Cloudinary/external image URLs.
-        # ─────────────────────────────────────────────────────────────
-        
-        if img.image_url:
-            url = str(img.image_url)
-            
-            if url.startswith('http://') or url.startswith('https://'):
-                return url
-
-            if request:
-                return request.build_absolute_uri(url)
-            
-            return url
-        # ─────────────────────────────────────────────────────────────
-        # 2. Otherwise use the ImageField.
-        # ─────────────────────────────────────────────────────────────
-        if img.image:
-            try:
-                url = img.image.url
-                
-                if url.startswith('http://') or url.startswith('https://'):
-                    return url
-                if request:
-                    return request.build_absolute_uri(url)
-                return url
-            
-            except Exception:
-                return None
-        return None
+        return get_product_image_url(obj.primary_image, request)
+    
     def get_variants(self, obj):
         qs = obj.variants.filter(is_active=True).order_by('id')[:1]
         return ProductVariantSerializer(qs, many=True, context=self.context).data
@@ -368,8 +296,8 @@ class ProductDetailSerializer(serializers.ModelSerializer):
         ]
     
     def get_primary_image(self, obj):
-        img = obj.primary_image
-        return img.image.url if img and img.image else None
+        request = self.context.get('request')
+        return get_product_image_url(obj.primary_image, request)
     
     def get_variants(self, obj):
             qs = obj.variants.filter(is_active=True)
