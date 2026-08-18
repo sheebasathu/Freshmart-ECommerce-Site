@@ -124,7 +124,7 @@ export default function ProductDetail() {
   // Fall back to primary_image string if images array is empty / absent.
   const rawImages = product.images?.length
     ? product.images.map(img => img?.image_url).filter(Boolean)
-    : [product.primary_image?.image_url].filter(Boolean)
+    : [product.primary_image].filter(Boolean)
 
   // We show up to 4 thumbnails; if fewer images exist we just show what we have
   const images = rawImages.slice(0, 4)
@@ -274,7 +274,7 @@ export default function ProductDetail() {
             <img
               key={images[activeImg]}          /* key forces re-render → natural fade */
               className={styles.mainImg}
-              src={images[activeImg] || '/images/capsicumdefault.png'}
+              src={images[activeImg] || ''}
               alt={product.name}
             />
             {images.length > 1 && (
@@ -609,7 +609,7 @@ export default function ProductDetail() {
                 >
                   <div className={styles.relatedImgWrap}>
                     <img
-                      src={rel.primary_image?.image_url || '/images/capsicumdefault.png'}
+                      src={rel.primary_image}
                       alt={rel.name}
                       loading="lazy"
                     />
